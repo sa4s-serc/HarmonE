@@ -1,8 +1,23 @@
+import threading
 import time
-from execute import execute
+from execute import execute_mape, execute_drift
+
+def run_execute_mape():
+    while True:
+        time.sleep(20)  # Runs every 5 seconds
+        execute_mape()
+
+def run_execute_drift():
+    while True:
+        time.sleep(120)  # Runs every 20 seconds
+        execute_drift()
+
+# Start both monitoring threads
+t1 = threading.Thread(target=run_execute_mape, daemon=True)
+t2 = threading.Thread(target=run_execute_drift, daemon=True)
+
+t1.start()
+t2.start()
 
 while True:
-    print("\n--- Running MAPE-K Loop ---")
-    execute()
-    print("--- Cycle Complete ---")
-    time.sleep(5)  # Run every 5 seconds
+    time.sleep(1)

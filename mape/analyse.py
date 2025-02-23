@@ -1,21 +1,35 @@
 from monitor import monitor_mape, monitor_drift
+import pandas as pd
 
-def analyse():
+def analyse_mape():
+    """Analyze MAPE & decide if a model switch is needed."""
     mape_data = monitor_mape()
-    drift_data = monitor_drift()
-
-    if not mape_data or not drift_data:
+    if not mape_data:
         return None
 
-    performance_issue = mape_data["mape"] > 10
-    slow_model = mape_data["avg_time"] > 0.01
-    high_energy = mape_data["avg_energy"] > 15
-    drift_detected = drift_data["kl_div"] > 0.5 or drift_data["energy_distance"] > 0.1
-    print(drift_detected)
-
     return {
-        "performance_issue": performance_issue,
-        "slow_model": slow_model,
-        "high_energy": high_energy,
-        "drift_detected": drift_detected
+        "performance_issue": mape_data["mape"] > 10,
+        "slow_model": mape_data["avg_time"] > 0.01,
+        "high_energy": mape_data["avg_energy"] > 15
     }
+
+def analyse_drift():
+    """Analyze drift & decide if retraining is needed."""
+    drift_data = monitor_drift()
+    if not drift_data:
+        return None
+
+    kl_div = drift_data["kl_div"]
+    energy_dist = drift_data["energy_distance"]
+
+    drift_detected = kl_div > 0.5 or energy_dist > 0.1
+
+    if drift_detected:
+        print("Drift detected! Storing drift data...")
+        try:
+            df = pd.read_csv("knowledge/predictions.csv")
+            df.columns = df.columns.str.strip()
+            df.tail(500).to_csv("knowledge/drift.csv", index=False)
+        except FileNotFoundError:
+            print("No predictions file found to store drift data.")
+    return {"drift_detected": drift_detected}
