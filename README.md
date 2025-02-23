@@ -76,7 +76,20 @@ python tools/train_models.py
 
 ## Running the System
 
-### 1. Start the Inference System
+### 1. Clearing `predictions.csv`
+
+To clear the `predictions.csv` file (located in the `knowledge/` directory) so that it retains new predictions:
+
+```bash
+sed -i '2,$d' knowledge/predictions.csv
+```
+
+### Explanation:
+- `sed`: A stream editor for filtering and transforming text.
+- `-i`: Edits the file in place.
+- `'2,$d'`: Deletes all lines from the second line (`2`) to the end of the file (`$`).
+
+### 2. Start the Inference System
 
 To run the main inference system, execute the following command:
 
@@ -84,7 +97,7 @@ To run the main inference system, execute the following command:
 python3 inference.py
 ```
 
-### 2. Start the Management System
+### 3. Start the Management System
 
 In a separate terminal, start the management system:
 
