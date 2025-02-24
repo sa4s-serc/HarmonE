@@ -4,7 +4,7 @@ from execute import execute_mape, execute_drift
 
 def run_execute_mape():
     while True:
-        time.sleep(20)  # Runs every 20 seconds
+        time.sleep(2)  # Runs every 20 seconds
         execute_mape()
 
 def run_execute_drift():

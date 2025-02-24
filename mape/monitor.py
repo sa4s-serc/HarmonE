@@ -3,27 +3,70 @@ import numpy as np
 import threading
 import time
 from scipy.stats import entropy, wasserstein_distance
+import json
+import os
 
-# Monitor MAPE every 5 sec
+mape_info_file = "knowledge/mape_info.json"
+thresholds_file = "knowledge/thresholds.json"
+
+def load_mape_info():
+    """Load last processed line, EMA, previous score from knowledge file."""
+    if not os.path.exists(mape_info_file):
+        return {"last_line": 0, "ema_score": 0.5, "prev_score": 0.5}
+    with open(mape_info_file, "r") as f:
+        return json.load(f)
+
+def save_mape_info(data):
+    """Save last processed line & updated EMA score."""
+    with open(mape_info_file, "w") as f:
+        json.dump(data, f, indent=4)
+
 def monitor_mape():
+    """Monitor accuracy Ai and normalized energy Ei for only new rows."""
+    info = load_mape_info()
+    last_line = info["last_line"]
+
     try:
-        df = pd.read_csv("knowledge/predictions.csv")
+        df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
         if df.empty:
-            print("MAPE Monitor: No predictions yet.")
             return None
-
-        df["mape"] = abs(df["true_value"] - df["predicted_value"]) / df["true_value"]
-        avg_mape = df["mape"].mean() * 100
-        avg_time = df["inference_time"].mean()
-        avg_energy = df["energy"].mean()
-        print(f"📊 MAPE: {avg_mape:.2f}%, Time: {avg_time:.4f}s, Energy: {avg_energy:.2f} W")
-
-        return {"mape": avg_mape, "avg_time": avg_time, "avg_energy": avg_energy}
-    
     except FileNotFoundError:
-        print("MAPE Monitor: No predictions found.")
         return None
+
+    # Compute Accuracy Ai = 1 - MAPE
+    df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
+    df["accuracy"] = 1 - df["mape"]
+
+    # Compute Normalized Energy Ei
+    try:
+        with open(thresholds_file, "r") as f:
+            thresholds = json.load(f)
+        energy_min, energy_max = thresholds["energy_min"], thresholds["energy_max"]
+    except (FileNotFoundError, KeyError):
+        energy_min, energy_max = df["energy"].min(), df["energy"].max()
+
+    avg_energy = df["energy"].mean()
+    df["normalized_energy"] = (df["energy"] - energy_min) / (energy_max - energy_min)
+
+    # Compute Affine Tradeoff Score Fi = βAi + (1 - β)(1 - Ei)
+    beta = thresholds.get("beta", 0.5)
+    df["score"] = beta * df["accuracy"] + (1 - beta) * (1 - df["normalized_energy"])
+
+    # Compute Exponential Moving Average (EMA)
+    gamma = thresholds.get("gamma", 0.8)
+    prev_score = info["prev_score"]
+    final_score = gamma * df["score"].mean() + (1 - gamma) * prev_score
+
+    # Store updated info
+    info.update({
+        "last_line": last_line + len(df),
+        "ema_score": final_score,
+        "prev_score": final_score
+    })
+    save_mape_info(info)
+
+    return {"accuracy": df["accuracy"].mean(), "energy": avg_energy, "score": final_score}
 
 # Monitor Drift every 20 sec
 def monitor_drift():

@@ -1,17 +1,32 @@
 from monitor import monitor_mape, monitor_drift
 import pandas as pd
+import json
+
+thresholds_file = "knowledge/thresholds.json"
 
 def analyse_mape():
-    """Analyze MAPE & decide if a model switch is needed."""
+    """Analyze MAPE-based performance and decide if switching is needed."""
     mape_data = monitor_mape()
     if not mape_data:
         return None
 
-    return {
-        "performance_issue": mape_data["mape"] > 10,
-        "slow_model": mape_data["avg_time"] > 0.01,
-        "high_energy": mape_data["avg_energy"] > 15
-    }
+    # Load thresholds
+    try:
+        with open(thresholds_file, "r") as f:
+            thresholds = json.load(f)
+    except FileNotFoundError:
+        thresholds = {"min_accuracy": 0.8, "max_energy": 15, "min_score": 0.5}
+
+    min_acc = thresholds["min_accuracy"]
+    max_energy = thresholds["max_energy"]
+    min_score = thresholds["min_score"]
+
+    # Check thresholds
+    switch_needed = (mape_data["accuracy"] < min_acc or 
+                     mape_data["energy"] > max_energy or 
+                     mape_data["score"] < min_score)
+
+    return {"switch_needed": switch_needed, "score": mape_data["score"]}
 
 def analyse_drift():
     """Analyze drift & decide if retraining is needed."""

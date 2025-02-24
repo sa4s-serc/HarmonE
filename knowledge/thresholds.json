@@ -1,0 +1,10 @@
+{
+    "min_accuracy": 0.6,
+    "max_energy": 35000,
+    "min_score": 0.5,
+    "beta": 0.5,
+    "gamma": 0.8,
+    "alpha": 0.1,
+    "energy_min": 0,
+    "energy_max": 35000
+}
