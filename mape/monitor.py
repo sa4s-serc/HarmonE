@@ -6,26 +6,44 @@ from scipy.stats import entropy, wasserstein_distance
 import json
 import os
 
+import pandas as pd
+import numpy as np
+import json
+import os
+
 mape_info_file = "knowledge/mape_info.json"
 thresholds_file = "knowledge/thresholds.json"
+debt_file = "knowledge/debt.json"
 
 def load_mape_info():
-    """Load last processed line, EMA, previous score from knowledge file."""
+    """Load last processed line from knowledge file."""
     if not os.path.exists(mape_info_file):
-        return {"last_line": 0, "ema_score": 0.5, "prev_score": 0.5}
+        return {"last_line": 0}
     with open(mape_info_file, "r") as f:
         return json.load(f)
 
 def save_mape_info(data):
-    """Save last processed line & updated EMA score."""
+    """Save last processed line."""
     with open(mape_info_file, "w") as f:
         json.dump(data, f, indent=4)
 
+def load_debt():
+    """Load current system debt from file."""
+    if not os.path.exists(debt_file):
+        return {"debt": 0}
+    with open(debt_file, "r") as f:
+        return json.load(f)
+
+def save_debt(debt_data):
+    """Save updated system debt."""
+    with open(debt_file, "w") as f:
+        json.dump(debt_data, f, indent=4)
+
 def monitor_mape():
-    """Monitor accuracy Ai and normalized energy Ei for only new rows."""
+    """Monitor accuracy and accumulate debt if thresholds are exceeded."""
     info = load_mape_info()
     last_line = info["last_line"]
-
+    
     try:
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
@@ -37,36 +55,33 @@ def monitor_mape():
     # Compute Accuracy Ai = 1 - MAPE
     df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
     df["accuracy"] = 1 - df["mape"]
+    avg_accuracy = df["accuracy"].mean()
 
-    # Compute Normalized Energy Ei
+    # Load adaptation thresholds
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
-        energy_min, energy_max = thresholds["energy_min"], thresholds["energy_max"]
-    except (FileNotFoundError, KeyError):
-        energy_min, energy_max = df["energy"].min(), df["energy"].max()
+        min_acc = thresholds.get("min_accuracy", 0.8)
+    except FileNotFoundError:
+        min_acc = 0.8  # Default
 
-    avg_energy = df["energy"].mean()
-    df["normalized_energy"] = (df["energy"] - energy_min) / (energy_max - energy_min)
+    # Load system debt
+    debt_data = load_debt()
+    debt = debt_data["debt"]
 
-    # Compute Affine Tradeoff Score Fi = βAi + (1 - β)(1 - Ei)
-    beta = thresholds.get("beta", 0.5)
-    df["score"] = beta * df["accuracy"] + (1 - beta) * (1 - df["normalized_energy"])
+    # If accuracy is above threshold, reduce debt
+    if avg_accuracy >= min_acc:
+        debt = max(0, debt - 0.05)  # Payback debt
+    else:
+        debt += 0.1  # Increase debt for using high-resource models
 
-    # Compute Exponential Moving Average (EMA)
-    gamma = thresholds.get("gamma", 0.8)
-    prev_score = info["prev_score"]
-    final_score = gamma * df["score"].mean() + (1 - gamma) * prev_score
+    save_debt({"debt": debt})
 
     # Store updated info
-    info.update({
-        "last_line": last_line + len(df),
-        "ema_score": final_score,
-        "prev_score": final_score
-    })
+    info["last_line"] = last_line + len(df)
     save_mape_info(info)
 
-    return {"accuracy": df["accuracy"].mean(), "energy": avg_energy, "score": final_score}
+    return {"accuracy": avg_accuracy, "debt": debt}
 
 # Monitor Drift every 20 sec
 def monitor_drift():
