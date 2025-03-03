@@ -4,7 +4,7 @@
     "beta": 0.5,
     "gamma": 0.8,
     "alpha": 0.1,
-    "energy_min": 0,
+    "energy_min": 10000,
     "energy_max": 35000,
 
     "debt_threshold": 1.5,  
@@ -15,7 +15,7 @@
     "exploration_prob": 0.1,  
     "historical_model_scores": {
         "lstm": 0.7,
-        "linear": 0.5,
+        "linear": 0.2,
         "svm": 0.3
     }
 }

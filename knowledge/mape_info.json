@@ -1,8 +1,8 @@
 {
-    "last_line": 687,
+    "last_line": 606,
     "ema_score": -231.3247607947669,
     "prev_score": -231.3247607947669,
-    "lr_model_version":1,
-    "lstm_model_version":1,
-    "svm_model_version":1
+    "lr_model_version": 1,
+    "lstm_model_version": 1,
+    "svm_model_version": 1
 }

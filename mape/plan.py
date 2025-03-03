@@ -1,6 +1,6 @@
 import json
 import random
-from analyse import analyse_mape
+from analyse import analyse_mape, analyse_drift
 
 thresholds_file = "knowledge/thresholds.json"
 model_file = "knowledge/model.csv"
@@ -20,6 +20,29 @@ def save_debt(debt_data):
     with open(debt_file, "w") as f:
         json.dump(debt_data, f, indent=4)
 
+def load_model_scores():
+    """Load historical model scores from thresholds.json."""
+    try:
+        with open(thresholds_file, "r") as f:
+            thresholds = json.load(f)
+        
+        # Access historical model scores from thresholds
+        model_scores = thresholds.get("historical_model_scores", {})
+        
+        if not model_scores:
+            print("❌ No historical model scores found. Using default scores.")
+            model_scores = {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
+        
+        return model_scores
+
+    except FileNotFoundError:
+        print("❌ Thresholds file not found. Using default model scores.")
+        return {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
+    except json.JSONDecodeError:
+        print("❌ Error reading thresholds file. Using default model scores.")
+        return {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
+
+
 def plan_mape():
     """Select the best model while managing debt through exploration and switching."""
     analysis = analyse_mape()
@@ -28,8 +51,7 @@ def plan_mape():
         return None
 
     accuracy = analysis["accuracy"]
-    debt_data = load_debt()
-    debt = debt_data["debt"]
+    debt = analysis["debt"]
 
     # Load thresholds
     try:
@@ -43,8 +65,7 @@ def plan_mape():
 
     # Load model historical performance (Debt Propensity)
     try:
-        with open(model_scores_file, "r") as f:
-            model_scores = json.load(f)
+        model_scores = load_model_scores()
     except FileNotFoundError:
         model_scores = {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
 
@@ -73,6 +94,7 @@ def plan_mape():
         return None
 
     return chosen_model
+
 
 
 def plan_drift():

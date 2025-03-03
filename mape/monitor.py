@@ -6,14 +6,9 @@ from scipy.stats import entropy, wasserstein_distance
 import json
 import os
 
-import pandas as pd
-import numpy as np
-import json
-import os
-
 mape_info_file = "knowledge/mape_info.json"
-thresholds_file = "knowledge/thresholds.json"
 debt_file = "knowledge/debt.json"
+thresholds_file = "knowledge/thresholds.json"
 
 def load_mape_info():
     """Load last processed line from knowledge file."""
@@ -43,7 +38,6 @@ def monitor_mape():
     """Monitor accuracy and accumulate debt if thresholds are exceeded."""
     info = load_mape_info()
     last_line = info["last_line"]
-    
     try:
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
