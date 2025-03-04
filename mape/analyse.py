@@ -5,7 +5,7 @@ import json
 thresholds_file = "knowledge/thresholds.json"
 
 def analyse_mape():
-    """Analyze accuracy and debt-based performance to decide if switching is needed."""
+    """Analyze accuracy and debt-based performance to decide if debt needs repayment."""
     mape_data = monitor_mape()
     if not mape_data:
         return None
@@ -22,10 +22,11 @@ def analyse_mape():
     except FileNotFoundError:
         min_acc, debt_threshold = 0.8, 1.5
 
-    # Check if the system is out of bounds
-    switch_needed = accuracy < min_acc or debt > debt_threshold
-
-    return {"switch_needed": switch_needed, "accuracy": accuracy, "debt": debt}
+    # Determine if action is required
+    if debt > debt_threshold:
+        return {"action_needed": "repay_debt", "accuracy": accuracy, "debt": debt}
+    
+    return {"action_needed": None, "accuracy": accuracy, "debt": debt}
 
 
 def analyse_drift():
@@ -47,4 +48,5 @@ def analyse_drift():
             df.tail(500).to_csv("knowledge/drift.csv", index=False)
         except FileNotFoundError:
             print("No predictions file found to store drift data.")
+    
     return {"drift_detected": drift_detected}

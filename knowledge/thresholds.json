@@ -7,7 +7,7 @@
     "energy_min": 10000,
     "energy_max": 35000,
     "B_max": 0.5,
-    "B_min": 0.1,
+    
     "debt_threshold": 1.5,  
     "debt_increase": 0.1,   
     "debt_decrease": 0.05,  

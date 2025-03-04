@@ -44,10 +44,10 @@ def load_model_scores():
 
 
 def plan_mape():
-    """Select the best model while managing debt through exploration and switching."""
+    """Plan strategy for model selection and debt management."""
     analysis = analyse_mape()
     if not analysis:
-        print("✅ No model switch needed (No performance data).")
+        print("✅ No action needed (No performance data).")
         return None
 
     accuracy = analysis["accuracy"]
@@ -60,8 +60,9 @@ def plan_mape():
         min_acc = thresholds.get("min_accuracy", 0.8)
         debt_threshold = thresholds.get("debt_threshold", 1.5)
         alpha = thresholds.get("alpha", 0.1)  # Exploration probability
+        debt_reduction_rate = thresholds.get("debt_reduction_rate", 0.2)  # Controlled debt repayment
     except FileNotFoundError:
-        min_acc, debt_threshold, alpha = 0.8, 1.5, 0.1
+        min_acc, debt_threshold, alpha, debt_reduction_rate = 0.8, 1.5, 0.1, 0.2
 
     # Load model historical performance (Debt Propensity)
     try:
@@ -69,16 +70,27 @@ def plan_mape():
     except FileNotFoundError:
         model_scores = {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
 
-    # Choose model based on exploration or best debt repayment
+    # **Debt Repayment Strategy**
+    if debt >= debt_threshold:
+        print(f"⚠️ High debt detected ({debt:.2f}). Applying debt repayment strategy.")
+
+        # Choose least resource-consuming model
+        chosen_model = min(model_scores, key=model_scores.get)
+        print(f"🔄 Switching to a debt-efficient model: {chosen_model.upper()}")
+
+        # Reduce debt gradually
+        new_debt = max(0, debt - debt_reduction_rate)
+        save_debt({"debt": new_debt})
+        print(f"💰 Debt reduced from {debt:.2f} to {new_debt:.2f}")
+
+        return chosen_model
+
+    # **Exploration vs Exploitation**
     if random.random() < alpha:
         chosen_model = random.choice(["lstm", "linear", "svm"])
         print(f"🎲 Random Exploration! Choosing {chosen_model.upper()}")
     else:
-        if debt >= debt_threshold:
-            print(f"⚠️ High debt detected ({debt:.2f}), switching to a debt-efficient model.")
-            chosen_model = min(model_scores, key=model_scores.get)  # Least resource-consuming model
-        else:
-            chosen_model = max(model_scores, key=model_scores.get)  # Most accurate model
+        chosen_model = max(model_scores, key=model_scores.get)  # Most accurate model
 
     print(f"🏆 Choosing model: {chosen_model.upper()}")
 
@@ -94,7 +106,6 @@ def plan_mape():
         return None
 
     return chosen_model
-
 
 
 def plan_drift():

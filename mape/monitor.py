@@ -47,9 +47,10 @@ def log_system_metrics(accuracy, energy, debt, model_name):
         log_entry.to_csv(system_metrics_file, mode='a', header=False, index=False)
 
 def monitor_mape():
-    """Monitor energy consumption and update debt accordingly."""
+    """Monitor energy consumption, accuracy, and track system debt dynamically."""
     info = load_mape_info()
     last_line = info["last_line"]
+
     try:
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
@@ -63,42 +64,38 @@ def monitor_mape():
     normalized_energy = avg_energy / max_energy if max_energy > 0 else 0  # Normalize energy
     model_used = df["model_used"].mode()[0]  # Most frequently used model
 
-    accuracy = r2_score(df["true_value"], df["predicted_value"])  # Compute R^2 score as accuracy
+    accuracy = r2_score(df["true_value"], df["predicted_value"])  # Compute R² score as accuracy
     
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
-        B_max = thresholds.get("B_max", 1.0)  # Upper threshold for system performance
-        B_min = thresholds.get("B_min", 0.5)  # Lower threshold for system performance
         beta = thresholds.get("beta", 0.5)  # Weight for accuracy vs energy
-        debt_threshold = thresholds.get("debt_threshold", 1.5)  # Debt threshold for switching models
     except FileNotFoundError:
-        B_max, B_min, beta, debt_threshold = 1.0, 0.5, 0.5, 1.5
+        beta = 0.5
 
+    # Load current debt
     debt_data = load_debt()
     debt = debt_data["debt"]
-    
-    # Compute payback debt adjustment
-    payback_debt = debt if debt > debt_threshold else 0
-    
-    # Compute system performance score S_i
-    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy) - payback_debt
-    
-    # Update debt based on performance score
-    if S_i > B_max:
-        debt += (S_i - B_max)
-    elif S_i < B_min:
-        debt = max(0, debt - (B_min - S_i))
 
+    # Compute system performance score
+    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy) - debt
+
+    # **Formalized Debt Accumulation:**
+    if S_i < 0:  # If system underperforms, increase debt
+        debt += abs(S_i)  # Accumulate the absolute shortfall
+
+    # Save updated debt and log system metrics
     save_debt({"debt": debt})
     log_system_metrics(accuracy, normalized_energy, debt, model_used)
-    
+
+    # Update the last processed line
     info["last_line"] = last_line + len(df)
     save_mape_info(info)
 
     return {"accuracy": accuracy, "energy": normalized_energy, "debt": debt, "model_used": model_used}
 
 def monitor_drift():
+    """Monitor data drift without enforcing immediate retraining."""
     try:
         df = pd.read_csv("knowledge/predictions.csv")
         df.columns = df.columns.str.strip()
