@@ -5,6 +5,7 @@ import time
 from scipy.stats import entropy, wasserstein_distance
 import json
 import os
+from sklearn.metrics import r2_score
 
 mape_info_file = "knowledge/mape_info.json"
 debt_file = "knowledge/debt.json"
@@ -57,13 +58,13 @@ def monitor_mape():
     except FileNotFoundError:
         return None
 
-    df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
-    df["accuracy"] = 1 - df["mape"]
-    avg_accuracy = df["accuracy"].mean()
+    avg_energy = df["energy"].mean()
     max_energy = df["energy"].max()
-    avg_energy = df["energy"].mean() / max_energy if max_energy > 0 else 0  # Normalize energy
+    normalized_energy = avg_energy / max_energy if max_energy > 0 else 0  # Normalize energy
     model_used = df["model_used"].mode()[0]  # Most frequently used model
 
+    accuracy = r2_score(df["true_value"], df["predicted_value"])  # Compute R^2 score as accuracy
+    
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
@@ -77,7 +78,7 @@ def monitor_mape():
     debt = debt_data["debt"]
     
     # Compute system performance score S_i
-    S_i = beta * avg_accuracy + (1 - beta) * (1 - avg_energy)
+    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy)
     
     # Update debt based on performance score
     if S_i > B_max:
@@ -86,12 +87,12 @@ def monitor_mape():
         debt = max(0, debt - (B_min - S_i))
 
     save_debt({"debt": debt})
-    log_system_metrics(avg_accuracy, avg_energy, debt, model_used)
+    log_system_metrics(accuracy, normalized_energy, debt, model_used)
     
     info["last_line"] = last_line + len(df)
     save_mape_info(info)
 
-    return {"accuracy": avg_accuracy, "energy": avg_energy, "debt": debt, "model_used": model_used}
+    return {"accuracy": accuracy, "energy": normalized_energy, "debt": debt, "model_used": model_used}
 
 def monitor_drift():
     try:
