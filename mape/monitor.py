@@ -71,14 +71,18 @@ def monitor_mape():
         B_max = thresholds.get("B_max", 1.0)  # Upper threshold for system performance
         B_min = thresholds.get("B_min", 0.5)  # Lower threshold for system performance
         beta = thresholds.get("beta", 0.5)  # Weight for accuracy vs energy
+        debt_threshold = thresholds.get("debt_threshold", 1.5)  # Debt threshold for switching models
     except FileNotFoundError:
-        B_max, B_min, beta = 1.0, 0.5, 0.5
+        B_max, B_min, beta, debt_threshold = 1.0, 0.5, 0.5, 1.5
 
     debt_data = load_debt()
     debt = debt_data["debt"]
     
+    # Compute payback debt adjustment
+    payback_debt = debt if debt > debt_threshold else 0
+    
     # Compute system performance score S_i
-    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy)
+    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy) - payback_debt
     
     # Update debt based on performance score
     if S_i > B_max:
