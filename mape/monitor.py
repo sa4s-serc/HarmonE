@@ -35,16 +35,18 @@ def save_debt(debt_data):
     with open(debt_file, "w") as f:
         json.dump(debt_data, f, indent=4)
 
-def log_system_metrics(accuracy, energy, debt):
-    """Log accuracy, energy, and PDS to system metrics file."""
-    log_entry = pd.DataFrame([{ "accuracy": accuracy, "energy": energy, "debt": debt, "timestamp": time.time()}])
+def log_system_metrics(accuracy, energy, debt, model_name):
+    """Log accuracy, energy, debt, and model name to system metrics file."""
+    log_entry = pd.DataFrame(
+        [{"accuracy": accuracy, "energy": energy, "debt": debt, "model_used": model_name, "timestamp": time.time()}]
+    )
     if not os.path.exists(system_metrics_file):
         log_entry.to_csv(system_metrics_file, index=False)
     else:
         log_entry.to_csv(system_metrics_file, mode='a', header=False, index=False)
 
 def monitor_mape():
-    """Monitor accuracy and accumulate debt if thresholds are exceeded."""
+    """Monitor energy consumption and update debt accordingly."""
     info = load_mape_info()
     last_line = info["last_line"]
     try:
@@ -58,29 +60,38 @@ def monitor_mape():
     df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
     df["accuracy"] = 1 - df["mape"]
     avg_accuracy = df["accuracy"].mean()
+    max_energy = df["energy"].max()
+    avg_energy = df["energy"].mean() / max_energy if max_energy > 0 else 0  # Normalize energy
+    model_used = df["model_used"].mode()[0]  # Most frequently used model
 
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
-        min_acc = thresholds.get("min_accuracy", 0.8)
+        B_max = thresholds.get("B_max", 1.0)  # Upper threshold for system performance
+        B_min = thresholds.get("B_min", 0.5)  # Lower threshold for system performance
+        beta = thresholds.get("beta", 0.5)  # Weight for accuracy vs energy
     except FileNotFoundError:
-        min_acc = 0.8  
+        B_max, B_min, beta = 1.0, 0.5, 0.5
 
     debt_data = load_debt()
     debt = debt_data["debt"]
-
-    if avg_accuracy >= min_acc:
-        debt = max(0, debt - 0.05)
-    else:
-        debt += 0.1  
+    
+    # Compute system performance score S_i
+    S_i = beta * avg_accuracy + (1 - beta) * (1 - avg_energy)
+    
+    # Update debt based on performance score
+    if S_i > B_max:
+        debt += (S_i - B_max)
+    elif S_i < B_min:
+        debt = max(0, debt - (B_min - S_i))
 
     save_debt({"debt": debt})
-    log_system_metrics(avg_accuracy, 1 - avg_accuracy, debt)  # Energy is inverse of accuracy
+    log_system_metrics(avg_accuracy, avg_energy, debt, model_used)
     
     info["last_line"] = last_line + len(df)
     save_mape_info(info)
 
-    return {"accuracy": avg_accuracy, "debt": debt}
+    return {"accuracy": avg_accuracy, "energy": avg_energy, "debt": debt, "model_used": model_used}
 
 def monitor_drift():
     try:
@@ -94,8 +105,10 @@ def monitor_drift():
         if len(df) >= window_size * 2:
             reference_window = df['true_value'].iloc[-2*window_size:-window_size]
             current_window = df['true_value'].iloc[-window_size:]
-            kl_div = entropy(np.histogram(reference_window, bins=50, density=True)[0] + 1e-10,
-            np.histogram(current_window, bins=50, density=True)[0] + 1e-10)
+            kl_div = entropy(
+                np.histogram(reference_window, bins=50, density=True)[0] + 1e-10,
+                np.histogram(current_window, bins=50, density=True)[0] + 1e-10
+            )
             energy_dist = wasserstein_distance(reference_window, current_window)
             print(f"🌊 Drift: KL={kl_div:.4f}, Energy Distance={energy_dist:.4f}")
             return {"kl_div": kl_div, "energy_distance": energy_dist}
