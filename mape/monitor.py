@@ -81,8 +81,11 @@ def monitor_mape():
     S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy) - debt
 
     # **Formalized Debt Accumulation:**
-    if S_i < 0:  # If system underperforms, increase debt
-        debt += abs(S_i)  # Accumulate the absolute shortfall
+    if S_i < 0:
+        debt += thresholds.get("debt_increase", 0.1) * abs(S_i)
+    else:
+        debt = max(0, debt - thresholds.get("debt_decrease", 0.1) * S_i)
+
 
     # Save updated debt and log system metrics
     save_debt({"debt": debt})
