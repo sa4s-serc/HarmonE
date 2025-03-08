@@ -6,6 +6,9 @@
     "gamma": 0.8,
     "alpha": 0.1,
     "E_m": 5000,
-    "E_M": 25000,
-    "max_debt": 1 
+    "E_M": 40000,
+    "max_debt": 1,
+    "recovery_time": 3,  
+    "debt_decay": 0.95, 
+    "switch_stability_threshold": 5 
 }

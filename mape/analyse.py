@@ -2,8 +2,6 @@ from monitor import monitor_mape, monitor_drift
 import pandas as pd
 import json
 
-thresholds_file = "knowledge/thresholds.json"
-
 import json
 from monitor import monitor_mape
 
@@ -11,21 +9,21 @@ thresholds_file = "knowledge/thresholds.json"
 mape_info_file = "knowledge/mape_info.json"
 
 def load_mape_info():
-    """Load stored MAPE info including energy debt."""
+    """Load stored MAPE info including energy debt and recovery cycles."""
     try:
         with open(mape_info_file, "r") as f:
             return json.load(f)
     except FileNotFoundError:
-        return {"energy_debt": 0}
-        
+        return {"energy_debt": 0, "recovery_cycles": 0}
+
 def save_mape_info(data):
-    """Save updated MAPE info including energy debt."""
+    """Save updated MAPE info including energy debt and recovery cycles."""
     with open(mape_info_file, "w") as f:
         json.dump(data, f, indent=4)
 
 def analyse_mape():
-    """Analyze MAPE-based performance and decide if switching is needed."""
-    mape_data = monitor_mape()
+    """Analyze performance and decide if switching is needed, with smarter debt management."""
+    mape_data = monitor_mape()  
     if not mape_data:
         print("⚠️ No MAPE data available for analysis.")
         return None
@@ -35,32 +33,37 @@ def analyse_mape():
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
     except FileNotFoundError:
-        thresholds = {"min_accuracy": 0.8, "max_energy": 15, "min_score": 0.5, "max_debt": 10}
+        thresholds = {"min_score": 0.5, "max_energy": 15, "max_debt": 10, "recovery_time": 3}
 
-    min_acc = thresholds["min_accuracy"]
-    max_energy = thresholds["max_energy"]
     min_score = thresholds["min_score"]
+    max_energy = thresholds["max_energy"]
     max_debt = thresholds["max_debt"]
+    recovery_time = thresholds["recovery_time"]
+    debt_decay = thresholds["debt_decay"]
 
-    # Load current energy debt
+    # Load current energy debt and recovery cycle count
     mape_info = load_mape_info()
     energy_debt = mape_info["energy_debt"]
+    recovery_cycles = mape_info["recovery_cycles"]
 
     # Compute energy excess or savings
     energy_excess = mape_data["normalized_energy"] - max_energy
     if energy_excess > 0:
         energy_debt += energy_excess  # Accumulate debt if above max_energy
     else:
-        energy_debt = max(0, energy_debt + energy_excess)  # Reduce debt when below threshold
+        # Instead of reducing debt instantly, reduce it proportionally to score improvement
+        energy_debt -= abs(energy_excess) * (mape_data["score"] ** 2)  # Weighted by score²
+
+    # Apply gradual debt decay if it's low but positive
+    if energy_debt > 0 and energy_excess <= 0:
+        energy_debt *= debt_decay  # Reduce 5% per cycle to prevent permanent accumulation
+
+    # Ensure energy debt doesn’t go negative
+    energy_debt = max(0, energy_debt)
 
     # Check if model switch is needed
     switch_needed = False
     threshold_violated = None
-
-    if mape_data["r2_score"] < min_acc:
-        print("⚠️ R² score below threshold! Model switch required.")
-        switch_needed = True
-        threshold_violated = "accuracy"
 
     if mape_data["score"] < min_score:
         print("⚠️ Model score too low! Model switch required.")
@@ -68,24 +71,31 @@ def analyse_mape():
         threshold_violated = "score"
 
     if energy_debt > max_debt:
-        print(f"⚠️ Energy Debt ({energy_debt:.2f}) exceeded max allowed ({max_debt}). Switching models!")
-        switch_needed = True
-        threshold_violated = "energy"
+        if recovery_cycles == 0:
+            print(f"⚠️ Energy Debt ({energy_debt:.2f}) exceeded max allowed ({max_debt}). Switching models!")
+            switch_needed = True
+            threshold_violated = "energy"
+            recovery_cycles = recovery_time  # Set the cooldown period
+        else:
+            print(f"⏳ Waiting for recovery cycles: {recovery_cycles} left.")
 
-    # Save updated energy debt
+
+    # Reduce recovery cycles if active
+    if recovery_cycles > 0:
+        recovery_cycles -= 1
+
+    # Save updated energy debt & recovery cycles
     mape_info["energy_debt"] = energy_debt
+    mape_info["recovery_cycles"] = recovery_cycles
     save_mape_info(mape_info)
 
-    print(f"📊 Current Energy Debt: {energy_debt:.2f}, Max Allowed: {max_debt}")
+    print(f"📊 Current Energy Debt: {energy_debt:.2f}, Max Allowed: {max_debt}, Recovery: {recovery_cycles}")
 
     return {
         "switch_needed": switch_needed,
         "score": mape_data["score"],
         "threshold_violated": threshold_violated
     }
-
-
-
 
 def analyse_drift():
     """Analyze drift & decide if retraining is needed."""

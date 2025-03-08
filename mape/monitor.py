@@ -9,23 +9,44 @@ from sklearn.metrics import r2_score
 
 mape_info_file = "knowledge/mape_info.json"
 thresholds_file = "knowledge/thresholds.json"
+model_file = "knowledge/model.csv"
 
 def load_mape_info():
-    """Load last processed line, EMA, previous score from knowledge file."""
-    if not os.path.exists(mape_info_file):
-        return {"last_line": 0, "ema_score": 0.5, "prev_score": 0.5}
+    # """Load stored MAPE info including model-specific EMA scores."""
+    # if not os.path.exists(mape_info_file):
+    #     return {
+    #         "last_line": 0,
+    #         "energy_debt": 0,
+    #         "lr_model_version": 1,
+    #         "lstm_model_version": 1,
+    #         "svm_model_version": 1,
+    #         "ema_scores": {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
+    #     }
     with open(mape_info_file, "r") as f:
         return json.load(f)
 
 def save_mape_info(data):
-    """Save last processed line & updated EMA score."""
+    """Save updated MAPE info including model-specific EMA scores."""
     with open(mape_info_file, "w") as f:
         json.dump(data, f, indent=4)
+
+def get_current_model():
+    """Fetch the currently active model from knowledge."""
+    try:
+        with open(model_file, "r") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None  # Default behavior if file doesn't exist
+
 
 def monitor_mape():
     """Monitor R² Score and Normalized Energy, and Compute Score."""
     info = load_mape_info()
     last_line = info["last_line"]
+    current_model = get_current_model()
+    if current_model is None:
+        print("⚠️ No model currently in use.")
+        return None
 
     try:
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
@@ -37,9 +58,8 @@ def monitor_mape():
         print("⚠️ No predictions.csv file found.")
         return None
 
-    print(f"🆕 Processing {len(df)} new rows from predictions.csv")
+    print(f"🆕 Processing {len(df)} new rows from predictions.csv for {current_model.upper()}")
 
-    # Compute R² Score
     r2 = r2_score(df["true_value"], df["predicted_value"])
 
     # Compute Normalized Energy
@@ -50,28 +70,31 @@ def monitor_mape():
     energy_normalized = (df["energy"].mean() - energy_min)/(energy_max - energy_min)
 
     beta = thresholds.get("beta", 0.5)
-    score = beta * r2 + (1 - beta) * (1 - energy_normalized)
+    model_score = beta * r2 + (1 - beta) * (1 - energy_normalized)
 
     # Compute Exponential Moving Average (EMA)
     gamma = thresholds.get("gamma", 0.8)
-    prev_score = info["prev_score"]
-    final_score = gamma * score + (1 - gamma) * prev_score
+    prev_score = info["ema_scores"][current_model]
+    final_score = gamma * model_score + (1 - gamma) * prev_score
+
+    # Log computed values
+    info["ema_scores"][current_model] = final_score
+    info["last_line"] += len(df)
 
     # Log computed values
     print(f"🔹 R² Score: {r2:.4f}")
     print(f"🔹 Normalized Energy: {energy_normalized:.4f}")
-    print(f"🔹 Score (Tradeoff): {score:.4f}")
-    print(f"🔹 EMA Score: {final_score:.4f}")
+    print(f"🔹 Model Score for {current_model.upper()}: {model_score:.4f}")
+    print(f"🔹 Updated EMA Score for {current_model.upper()}: {final_score:.4f}")
 
-    # Store updated info
-    info.update({
-        "last_line": last_line + len(df),
-        "ema_score": final_score,
-        "prev_score": final_score
-    })
     save_mape_info(info)
 
-    return {"r2_score": r2, "normalized_energy": energy_normalized, "score": final_score}
+    return {
+        "r2_score": r2,
+        "normalized_energy": energy_normalized,
+        "score": final_score
+    }
+
 
 
 def monitor_drift():

@@ -1,0 +1,4 @@
+model,region,cost,sustainability,timestamp
+lstm,Amsterdam,0.72,0.9,2025-03-08 15:43:53.054361
+lstm,USA,0.443,0.7,2025-03-08 15:45:56.392946
+linear,India,0.298,0.5,2025-03-08 15:47:59.343190
