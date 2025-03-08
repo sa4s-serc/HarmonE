@@ -1,7 +1,8 @@
 {
-    "last_line": 0,
-    "ema_score": -231.3247607947669,
-    "prev_score": -231.3247607947669,
+    "last_line": 270,
+    "ema_score": 0.5994316947772473,
+    "prev_score": 0.5994316947772473,
+    "energy_debt": 0,
     "lr_model_version": 1,
     "lstm_model_version": 1,
     "svm_model_version": 1

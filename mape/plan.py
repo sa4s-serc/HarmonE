@@ -9,12 +9,21 @@ from analyse import analyse_mape, analyse_drift
 thresholds_file = "knowledge/thresholds.json"
 model_file = "knowledge/model.csv"
 
+# Predefined model energy efficiency (lower = better)
+MODEL_ENERGY_EFFICIENCY = {
+    "lstm": 0.7,    # Medium energy consumption
+    "linear": 0.3,  # Most energy-efficient
+    "svm": 0.5      # Moderate energy consumption
+}
+
 def plan_mape():
-    """Select the best model based on score, with exploration (alpha)."""
+    """Select the best model based on score, prioritizing energy efficiency when needed."""
     analysis = analyse_mape()
     if not analysis or not analysis["switch_needed"]:
         print("✅ No model switch needed (Thresholds not violated).")
         return None
+
+    threshold_violated = analysis["threshold_violated"]
 
     # Load exploration probability (alpha)
     try:
@@ -32,13 +41,19 @@ def plan_mape():
     except FileNotFoundError:
         model_scores = {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
 
-    # Pick best model or explore randomly
-    if random.random() < alpha:
-        chosen_model = random.choice(["lstm", "linear", "svm"])
-        print(f"🎲 Random Exploration! Choosing {chosen_model.upper()}")
+    # If energy is the issue, pick the most energy-efficient model
+    if threshold_violated == "energy":
+        chosen_model = min(MODEL_ENERGY_EFFICIENCY, key=MODEL_ENERGY_EFFICIENCY.get)
+        print(f"⚡ Energy threshold violated. Switching to the most efficient model: {chosen_model.upper()}")
+
+    # Otherwise, use score-based selection with exploration
     else:
-        chosen_model = max(model_scores, key=model_scores.get)
-        print(f"🏆 Choosing best model: {chosen_model.upper()}")
+        if random.random() < alpha:
+            chosen_model = random.choice(["lstm", "linear", "svm"])
+            print(f"🎲 Random Exploration! Choosing {chosen_model.upper()}")
+        else:
+            chosen_model = max(model_scores, key=model_scores.get)
+            print(f"🏆 Choosing best model: {chosen_model.upper()}")
 
     # Check if the chosen model is already in use
     try:
@@ -52,6 +67,7 @@ def plan_mape():
         return None
 
     return chosen_model
+
 
 def plan_drift():
     """Decide if retraining is needed based on drift analysis."""

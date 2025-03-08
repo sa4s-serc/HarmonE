@@ -23,7 +23,7 @@ def save_mape_info(data):
         json.dump(data, f, indent=4)
 
 def monitor_mape():
-    """Monitor accuracy Ai and normalized energy Ei for only new rows."""
+    """Monitor R² Score and Normalized Energy, and Compute Score."""
     info = load_mape_info()
     last_line = info["last_line"]
 
@@ -31,33 +31,38 @@ def monitor_mape():
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
         if df.empty:
+            print("📉 No new data to process in predictions.csv")
             return None
     except FileNotFoundError:
+        print("⚠️ No predictions.csv file found.")
         return None
 
-    # Compute Accuracy Ai = 1 - MAPE
-    df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
-    df["accuracy"] = 1 - df["mape"]
+    print(f"🆕 Processing {len(df)} new rows from predictions.csv")
 
-    # Compute Normalized Energy Ei
-    try:
-        with open(thresholds_file, "r") as f:
-            thresholds = json.load(f)
-        energy_min, energy_max = thresholds["energy_min"], thresholds["energy_max"]
-    except (FileNotFoundError, KeyError):
-        energy_min, energy_max = df["energy"].min(), df["energy"].max()
+    # Compute R² Score
+    r2 = r2_score(df["true_value"], df["predicted_value"])
 
-    avg_energy = df["energy"].mean()
+    # Compute Normalized Energy
+    with open(thresholds_file, "r") as f:
+        thresholds = json.load(f)
+    energy_min, energy_max = thresholds["E_m"], thresholds["E_M"]
+
     df["normalized_energy"] = (df["energy"] - energy_min) / (energy_max - energy_min)
 
-    # Compute Affine Tradeoff Score Fi = βAi + (1 - β)(1 - Ei)
+    # Compute Score as an Affine Combination of R² Score & Normalized Energy
     beta = thresholds.get("beta", 0.5)
-    df["score"] = beta * df["accuracy"] + (1 - beta) * (1 - df["normalized_energy"])
+    df["score"] = beta * r2 + (1 - beta) * (1 - df["normalized_energy"])
 
     # Compute Exponential Moving Average (EMA)
     gamma = thresholds.get("gamma", 0.8)
     prev_score = info["prev_score"]
     final_score = gamma * df["score"].mean() + (1 - gamma) * prev_score
+
+    # Log computed values
+    print(f"🔹 R² Score: {r2:.4f}")
+    print(f"🔹 Normalized Energy: {df['normalized_energy'].mean():.4f}")
+    print(f"🔹 Score (Tradeoff): {df['score'].mean():.4f}")
+    print(f"🔹 EMA Score: {final_score:.4f}")
 
     # Store updated info
     info.update({
@@ -67,7 +72,8 @@ def monitor_mape():
     })
     save_mape_info(info)
 
-    return {"accuracy": df["accuracy"].mean(), "energy": avg_energy, "score": final_score}
+    return {"r2_score": r2, "normalized_energy": df["normalized_energy"].mean(), "score": final_score}
+
 
 def monitor_drift():
     """Monitor data drift without enforcing immediate retraining."""
