@@ -46,22 +46,21 @@ def monitor_mape():
     with open(thresholds_file, "r") as f:
         thresholds = json.load(f)
     energy_min, energy_max = thresholds["E_m"], thresholds["E_M"]
+    print(df["energy"].mean() ,energy_min,energy_max)
+    energy_normalized = (df["energy"].mean() - energy_min)/(energy_max - energy_min)
 
-    df["normalized_energy"] = (df["energy"] - energy_min) / (energy_max - energy_min)
-
-    # Compute Score as an Affine Combination of R² Score & Normalized Energy
     beta = thresholds.get("beta", 0.5)
-    df["score"] = beta * r2 + (1 - beta) * (1 - df["normalized_energy"])
+    score = beta * r2 + (1 - beta) * (1 - energy_normalized)
 
     # Compute Exponential Moving Average (EMA)
     gamma = thresholds.get("gamma", 0.8)
     prev_score = info["prev_score"]
-    final_score = gamma * df["score"].mean() + (1 - gamma) * prev_score
+    final_score = gamma * score + (1 - gamma) * prev_score
 
     # Log computed values
     print(f"🔹 R² Score: {r2:.4f}")
-    print(f"🔹 Normalized Energy: {df['normalized_energy'].mean():.4f}")
-    print(f"🔹 Score (Tradeoff): {df['score'].mean():.4f}")
+    print(f"🔹 Normalized Energy: {energy_normalized:.4f}")
+    print(f"🔹 Score (Tradeoff): {score:.4f}")
     print(f"🔹 EMA Score: {final_score:.4f}")
 
     # Store updated info
@@ -72,7 +71,7 @@ def monitor_mape():
     })
     save_mape_info(info)
 
-    return {"r2_score": r2, "normalized_energy": df["normalized_energy"].mean(), "score": final_score}
+    return {"r2_score": r2, "normalized_energy": energy_normalized, "score": final_score}
 
 
 def monitor_drift():
