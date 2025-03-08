@@ -8,46 +8,22 @@ import os
 from sklearn.metrics import r2_score
 
 mape_info_file = "knowledge/mape_info.json"
-debt_file = "knowledge/debt.json"
 thresholds_file = "knowledge/thresholds.json"
-system_metrics_file = "knowledge/system_metrics.csv"
 
 def load_mape_info():
-    """Load last processed line from knowledge file."""
+    """Load last processed line, EMA, previous score from knowledge file."""
     if not os.path.exists(mape_info_file):
-        return {"last_line": 0}
+        return {"last_line": 0, "ema_score": 0.5, "prev_score": 0.5}
     with open(mape_info_file, "r") as f:
         return json.load(f)
 
 def save_mape_info(data):
-    """Save last processed line."""
+    """Save last processed line & updated EMA score."""
     with open(mape_info_file, "w") as f:
         json.dump(data, f, indent=4)
 
-def load_debt():
-    """Load current system debt from file."""
-    if not os.path.exists(debt_file):
-        return {"debt": 0}
-    with open(debt_file, "r") as f:
-        return json.load(f)
-
-def save_debt(debt_data):
-    """Save updated system debt."""
-    with open(debt_file, "w") as f:
-        json.dump(debt_data, f, indent=4)
-
-def log_system_metrics(accuracy, energy, debt, model_name):
-    """Log accuracy, energy, debt, and model name to system metrics file."""
-    log_entry = pd.DataFrame(
-        [{"accuracy": accuracy, "energy": energy, "debt": debt, "model_used": model_name, "timestamp": time.time()}]
-    )
-    if not os.path.exists(system_metrics_file):
-        log_entry.to_csv(system_metrics_file, index=False)
-    else:
-        log_entry.to_csv(system_metrics_file, mode='a', header=False, index=False)
-
 def monitor_mape():
-    """Monitor energy consumption, accuracy, and track system debt dynamically."""
+    """Monitor accuracy Ai and normalized energy Ei for only new rows."""
     info = load_mape_info()
     last_line = info["last_line"]
 
@@ -59,43 +35,39 @@ def monitor_mape():
     except FileNotFoundError:
         return None
 
-    avg_energy = df["energy"].mean()
-    max_energy = df["energy"].max()
-    normalized_energy = avg_energy / max_energy if max_energy > 0 else 0  # Normalize energy
-    model_used = df["model_used"].mode()[0]  # Most frequently used model
+    # Compute Accuracy Ai = 1 - MAPE
+    df["mape"] = abs(df["true_value"] - df["predicted_value"]) / (df["true_value"] + 1e-5)
+    df["accuracy"] = 1 - df["mape"]
 
-    accuracy = r2_score(df["true_value"], df["predicted_value"])  # Compute R² score as accuracy
-    
+    # Compute Normalized Energy Ei
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
-        beta = thresholds.get("beta", 0.5)  # Weight for accuracy vs energy
-    except FileNotFoundError:
-        beta = 0.5
+        energy_min, energy_max = thresholds["energy_min"], thresholds["energy_max"]
+    except (FileNotFoundError, KeyError):
+        energy_min, energy_max = df["energy"].min(), df["energy"].max()
 
-    # Load current debt
-    debt_data = load_debt()
-    debt = debt_data["debt"]
+    avg_energy = df["energy"].mean()
+    df["normalized_energy"] = (df["energy"] - energy_min) / (energy_max - energy_min)
 
-    # Compute system performance score
-    S_i = beta * accuracy + (1 - beta) * (1 - normalized_energy) - debt
+    # Compute Affine Tradeoff Score Fi = βAi + (1 - β)(1 - Ei)
+    beta = thresholds.get("beta", 0.5)
+    df["score"] = beta * df["accuracy"] + (1 - beta) * (1 - df["normalized_energy"])
 
-    # **Formalized Debt Accumulation:**
-    if S_i < 0:
-        debt += thresholds.get("debt_increase", 0.1) * abs(S_i)
-    else:
-        debt = max(0, debt - thresholds.get("debt_decrease", 0.1) * S_i)
+    # Compute Exponential Moving Average (EMA)
+    gamma = thresholds.get("gamma", 0.8)
+    prev_score = info["prev_score"]
+    final_score = gamma * df["score"].mean() + (1 - gamma) * prev_score
 
-
-    # Save updated debt and log system metrics
-    save_debt({"debt": debt})
-    log_system_metrics(accuracy, normalized_energy, debt, model_used)
-
-    # Update the last processed line
-    info["last_line"] = last_line + len(df)
+    # Store updated info
+    info.update({
+        "last_line": last_line + len(df),
+        "ema_score": final_score,
+        "prev_score": final_score
+    })
     save_mape_info(info)
 
-    return {"accuracy": accuracy, "energy": normalized_energy, "debt": debt, "model_used": model_used}
+    return {"accuracy": df["accuracy"].mean(), "energy": avg_energy, "score": final_score}
 
 def monitor_drift():
     """Monitor data drift without enforcing immediate retraining."""

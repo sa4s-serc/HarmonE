@@ -6,17 +6,16 @@ debt_file = "knowledge/debt.json"
 model_file = "knowledge/model.csv"
 
 def execute_mape():
-    """Executes the model switch or debt repayment strategy based on the planner's decision."""
+    """Switch to the best model based on MAPE analysis."""
     decision = plan_mape()
     if not decision:
-        print("✅ MAPE: No action needed.")
+        print("MAPE: No action needed.")
         return
 
-    # If the decision is to switch models
-    if isinstance(decision, str):
-        print(f"⚡ Switching model to {decision.upper()}")
-        with open(model_file, "w") as f:
-            f.write(decision)
+    print(f"⚡ Switching model to {decision.upper()}")
+    with open("knowledge/model.csv", "w") as f:
+        f.write(decision)
+
 
         # Reduce debt only if the planner selected a more efficient model
         try:

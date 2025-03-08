@@ -5,28 +5,28 @@ import json
 thresholds_file = "knowledge/thresholds.json"
 
 def analyse_mape():
-    """Analyze accuracy and debt-based performance to decide if debt needs repayment."""
+    """Analyze MAPE-based performance and decide if switching is needed."""
     mape_data = monitor_mape()
     if not mape_data:
         return None
-
-    accuracy = mape_data["accuracy"]
-    debt = mape_data["debt"]
 
     # Load thresholds
     try:
         with open(thresholds_file, "r") as f:
             thresholds = json.load(f)
-        min_acc = thresholds.get("min_accuracy", 0.8)
-        debt_threshold = thresholds.get("debt_threshold", 1.5)
     except FileNotFoundError:
-        min_acc, debt_threshold = 0.8, 1.5
+        thresholds = {"min_accuracy": 0.8, "max_energy": 15, "min_score": 0.5}
 
-    # Determine if action is required
-    if debt > debt_threshold:
-        return {"action_needed": "repay_debt", "accuracy": accuracy, "debt": debt}
-    
-    return {"action_needed": None, "accuracy": accuracy, "debt": debt}
+    min_acc = thresholds["min_accuracy"]
+    max_energy = thresholds["max_energy"]
+    min_score = thresholds["min_score"]
+
+    # Check thresholds
+    switch_needed = (mape_data["accuracy"] < min_acc or 
+                     mape_data["energy"] > max_energy or 
+                     mape_data["score"] < min_score)
+
+    return {"switch_needed": switch_needed, "score": mape_data["score"]}
 
 
 def analyse_drift():
