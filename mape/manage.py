@@ -42,5 +42,6 @@ t2 = threading.Thread(target=run_execute_drift, daemon=True)
 t1.start()
 t2.start()
 
-while True:
-    time.sleep(1)
+exit_event = threading.Event()
+exit_event.wait()
+
