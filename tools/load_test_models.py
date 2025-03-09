@@ -5,13 +5,13 @@ import numpy as np
 import pandas as pd
 import time
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import r2_score
 
 # ---------------- Load Dataset ----------------
 print("Loading dataset...")
 
-df = pd.read_csv("data/synthetic_data.csv")
-data = df["aggregated_is_iceberg"].values
+df = pd.read_csv("data/pems/flow_data_train.csv")
+data = df["flow"].values
 
 # Normalize data for LSTM
 scaler = MinMaxScaler()
@@ -32,7 +32,7 @@ def create_sequences(data, seq_length=10):
     return np.array(X), np.array(y)
 
 # Prepare test sequences
-seq_length = 10
+seq_length = 5
 X_test, y_test = create_sequences(test_data, seq_length)
 
 print("Test sequences prepared.")
@@ -112,10 +112,11 @@ print(f"SVM Inference Time: {svm_inference_time:.6f} seconds")
 
 print("\nEvaluation Scores:")
 
-mae_lstm = mean_absolute_error(y_test_actual, y_pred_lstm_actual)
-mae_lr = mean_absolute_error(y_test_actual, y_pred_lr_actual)
-mae_svm = mean_absolute_error(y_test_actual, y_pred_svm_actual)
+r2_lstm = r2_score(y_test_actual, y_pred_lstm_actual)
+r2_lr = r2_score(y_test_actual, y_pred_lr_actual)
+r2_svm = r2_score(y_test_actual, y_pred_svm_actual)
 
-print(f"LSTM MAE: {mae_lstm:.6f}")
-print(f"Linear Regression MAE: {mae_lr:.6f}")
-print(f"SVM MAE: {mae_svm:.6f}")
+print(f"LSTM r2: {r2_lstm:.6f}")
+print(f"Linear Regression r2: {r2_lr:.6f}")
+print(f"SVM r2: {r2_svm:.6f}")
+

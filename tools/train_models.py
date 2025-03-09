@@ -8,7 +8,7 @@ import torch.optim as optim
 import pickle
 from tqdm import tqdm
 from sklearn.svm import SVR
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, TensorDataset
@@ -54,8 +54,10 @@ def save_model_and_data(model, model_name, train_data):
     print(f"{model_name} saved at {version_path} and {model_path}")
 
 # Load the dataset
-df = pd.read_csv("data/synthetic_data.csv")
-data = df["aggregated_is_iceberg"].values
+# df = pd.read_csv("data/synthetic_data.csv")
+# data = df["aggregated_is_iceberg"].values
+df = pd.read_csv("data/pems/flow_data_train.csv")
+data = df["flow"].values
 
 # Normalize data for LSTM
 scaler = MinMaxScaler()
@@ -73,7 +75,7 @@ def create_sequences(data, seq_length=10):
         y.append(data[i+seq_length])
     return np.array(X), np.array(y)
 
-seq_length = 10
+seq_length = 5
 X_train, y_train = create_sequences(train_data, seq_length)
 X_test, y_test = create_sequences(test_data, seq_length)
 
@@ -113,7 +115,7 @@ save_model_and_data(lstm_model, "lstm_model", train_df)
 
 # ---------------- Linear Regression ----------------
 print("Training Linear Regression model...")
-lr_model = LinearRegression()
+lr_model = Ridge(alpha=256)
 lr_model.fit(X_train, y_train)
 
 # Save Linear Regression model with versioning and in the original directory
@@ -121,7 +123,7 @@ save_model_and_data(lr_model, "lr_model", train_df)
 
 # ---------------- Support Vector Machine (SVM) ----------------
 print("Training SVM model...")
-svm_model = SVR(kernel="linear", C=1.0, tol=0.01)
+svm_model = SVR(kernel="linear", C=0.05, tol=0.16)
 svm_model.fit(X_train, y_train)
 
 # Save SVM model with versioning and in the original directory

@@ -1,13 +1,13 @@
 {
-    "last_line": 1271,
-    "energy_debt": 0.37331083795985576,
+    "last_line": 0,
+    "energy_debt": 0,
     "lr_model_version": 1,
-    "lstm_model_version": 2,
+    "lstm_model_version": 1,
     "svm_model_version": 1,
     "ema_scores": {
-        "lstm": -0.3927376725421572,
-        "linear": -0.12307784441359745,
-        "svm": -0.0846486039109757
+        "lstm": 0.82,
+        "linear": 0.75,
+        "svm": 0.79
     },
     "recovery_cycles": 0
 }

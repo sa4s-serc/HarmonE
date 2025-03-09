@@ -19,8 +19,8 @@ energy_meter = pyRAPL.Measurement("inference")
 # ---------------- Load Dataset ----------------
 print("Loading synthetic data stream...")
 
-df = pd.read_csv("data/synthetic_data_50k.csv")
-data = df["aggregated_is_iceberg"].values
+df = pd.read_csv("data/pems/flow_data_train.csv")
+data = df["flow"].values
 
 # Normalize data
 scaler = MinMaxScaler()
@@ -34,7 +34,7 @@ def create_sequences(data, seq_length=10):
         y.append(data[i+seq_length])
     return np.array(X), np.array(y)
 
-seq_length = 10
+seq_length = 5
 X_stream, y_stream = create_sequences(data_scaled, seq_length)
 
 print("Data stream prepared. Streaming inference begins...")
