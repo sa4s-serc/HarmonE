@@ -10,7 +10,7 @@ from sklearn.metrics import r2_score
 # ---------------- Load Dataset ----------------
 print("Loading dataset...")
 
-df = pd.read_csv("data/pems/flow_data_train.csv")
+df = pd.read_csv("data/pems/flow_data_cleaned.csv")
 data = df["flow"].values
 
 # Normalize data for LSTM
