@@ -8,7 +8,7 @@ import torch.optim as optim
 import pickle
 from cloud_simulation import get_dynamic_price, get_sustainability_score
 from sklearn.svm import SVR
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, TensorDataset
 
@@ -53,7 +53,7 @@ def save_model_and_data(model, model_name, train_data):
     train_data.to_csv(os.path.join(version_path, "data.csv"), index=False)
     print(f"✔ {model_name} saved at {version_path} and {model_path}")
 
-def create_sequences(data, seq_length=10):
+def create_sequences(data, seq_length=5):
     """Create time series sequences for training."""
     X, y = [], []
     for i in range(len(data) - seq_length):
@@ -115,17 +115,17 @@ def execute_retraining(model_name):
     scaler = MinMaxScaler()
     data_scaled = scaler.fit_transform(data.reshape(-1, 1)).flatten()
 
-    seq_length = 10
+    seq_length = 5
     X_train, y_train = create_sequences(data_scaled, seq_length)
     train_df = pd.DataFrame({"train_data": data_scaled})
 
     if model_name == "linear":
-        model = LinearRegression()
+        model = Ridge(alpha=256)
         model.fit(X_train, y_train)
         save_model_and_data(model, "lr_model", train_df)
 
     elif model_name == "svm":
-        model = SVR(kernel="linear", C=1.0, tol=0.01)
+        model = SVR(kernel="linear", C=0.05, tol=0.16)
         model.fit(X_train, y_train)
         save_model_and_data(model, "svm_model", train_df)
 
