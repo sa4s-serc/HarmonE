@@ -124,6 +124,6 @@ for i in range(len(X_stream)):
           f"Inference Time: {inference_time:.6f} sec, Energy: {energy_usage_uJ} µJ")
 
     # Simulate real-time streaming delay
-    time.sleep(0.2)
+    time.sleep(0.15)
 
 print("\nStreaming inference completed. Predictions saved in knowledge/predictions.csv")
