@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import entropy, wasserstein_distance
 
 # Load dataset
-df = pd.read_csv("data/pems/flow_data_drifted.csv")
+df = pd.read_csv("data/pems/flow_data_test.csv")
 df.columns = df.columns.str.strip()  # Strip any whitespace from column names
 
 # Parameters
