@@ -1,7 +1,7 @@
 {
     "min_accuracy": 0.75,
     "max_energy": 1,  
-    "min_score": 0.75,
+    "min_score": 0.70,
     "beta": 0.85,
     "gamma": 0.8,
     "alpha": 0.1,
