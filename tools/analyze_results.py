@@ -36,21 +36,30 @@ df_all = pd.concat(dfs, ignore_index=True)
 
 # ----------------- DESCRIPTIVE STATISTICS -----------------
 
-summary_stats = df_all.groupby("approach").agg(
-    mean_true_value=("true_value", "mean"),
-    mean_predicted_value=("predicted_value", "mean"),
-    mae=("true_value", lambda x: np.mean(np.abs(x - df_all["predicted_value"]))),
-    rmse=("true_value", lambda x: np.sqrt(np.mean((x - df_all["predicted_value"])**2))),
-    mape=("true_value", lambda x: np.mean(np.abs((x - df_all["predicted_value"]) / x)) * 100),
-    mean_inference_time=("inference_time", "mean"),
-    mean_energy=("energy", "mean")
-).reset_index()
+from sklearn.metrics import r2_score
 
-# Save statistics
+def compute_metrics(group):
+    y_true = group["true_value"]
+    y_pred = group["predicted_value"]
+    
+    return pd.Series({
+        "mean_true_value": y_true.mean(),
+        "mean_predicted_value": y_pred.mean(),
+        "mae": np.mean(np.abs(y_true - y_pred)),
+        "rmse": np.sqrt(np.mean((y_true - y_pred) ** 2)),
+        "mape": np.mean(np.abs((y_true - y_pred) / y_true)) * 100,
+        "r2_score": r2_score(y_true, y_pred),
+        "mean_inference_time": group["inference_time"].mean(),
+        "mean_energy": group["energy"].mean()
+    })
+
+# Group by approach and apply the function
+summary_stats = df_all.groupby("approach").apply(compute_metrics).reset_index()
+
+# Save summary statistics
 summary_stats.to_csv(os.path.join(output_dir, "summary_statistics.csv"), index=False)
 
-with open(os.path.join(output_dir, "summary_statistics.txt"), "w") as f:
-    f.write(summary_stats.to_string())
+print("Summary statistics saved with R² score added.")
 
 # ----------------- VISUALIZATIONS -----------------
 
