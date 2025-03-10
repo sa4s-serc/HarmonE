@@ -21,6 +21,7 @@ approach_map = {
     1: "Linear Regression (No Retraining)",
     2: "SVM (No Retraining)",
     3: "LSTM (No Retraining)",
+    4: "Swiching"
     # Add more mappings as needed when you extend experiments
 }
 
