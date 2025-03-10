@@ -31,7 +31,7 @@ def load_mape_info():
         }
 
 def plan_mape():
-    """Select the best model based on its EMA score, prioritizing energy efficiency when needed."""
+    """Select the best model based on EMA scores or exploratory switching."""
     analysis = analyse_mape()
     if not analysis or not analysis["switch_needed"]:
         print("✅ No model switch needed (Thresholds not violated).")
@@ -43,14 +43,28 @@ def plan_mape():
     mape_info = load_mape_info()
     ema_scores = mape_info["ema_scores"]
 
+    # Load exploration probability (alpha)
+    try:
+        with open(thresholds_file, "r") as f:
+            thresholds = json.load(f)
+        alpha = thresholds.get("alpha", 0.1)
+    except FileNotFoundError:
+        alpha = 0.1
+
+    # If in exploratory mode, choose a random model
+    if random.random() < alpha:
+        chosen_model = random.choice(["lstm", "linear", "svm"])
+        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
+    
     # If energy is the issue, pick the most energy-efficient model
-    if threshold_violated == "energy":
+    elif threshold_violated == "energy":
         chosen_model = min(MODEL_ENERGY_EFFICIENCY, key=MODEL_ENERGY_EFFICIENCY.get)
         print(f"⚡ Energy threshold violated. Switching to the most efficient model: {chosen_model.upper()}")
-
+    
+    # Otherwise, choose the best-scoring model
     else:
         print(ema_scores)
-        chosen_model = max(ema_scores, key=ema_scores.get)  # Select model with highest EMA score
+        chosen_model = max(ema_scores, key=ema_scores.get)
         print(f"🏆 Choosing best model based on EMA scores: {chosen_model.upper()}")
 
     # Check if the chosen model is already in use
