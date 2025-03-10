@@ -1,0 +1,8 @@
+Wilcoxon test between Linear Regression (No Retraining) and SVM (No Retraining): p-value = 0.00000
+Wilcoxon test between Linear Regression (No Retraining) and LSTM (No Retraining): p-value = 0.00000
+Wilcoxon test between SVM (No Retraining) and LSTM (No Retraining): p-value = 0.00000
+Correlation between Energy and Inference Time:
+                  energy  inference_time
+energy          1.000000        0.867231
+inference_time  0.867231        1.000000
+ANOVA p-value for error comparison across approaches: 0.00000

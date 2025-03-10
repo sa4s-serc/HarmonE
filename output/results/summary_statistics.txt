@@ -1,0 +1,4 @@
+                            approach  mean_true_value  mean_predicted_value        mae       rmse        mape  mean_inference_time   mean_energy
+0               LSTM (No Retraining)        96.975586             87.791030  18.761596  26.719241   39.891095             0.004918  27606.149490
+1  Linear Regression (No Retraining)        96.975586             90.633400  33.572446  41.518531  101.174563             0.001082   7917.780698
+2                SVM (No Retraining)        96.975586            104.741794  31.898961  38.846045  125.273625             0.001291  10079.792839
