@@ -28,7 +28,7 @@ def analyse_mape():
     """Analyze performance and decide if switching is needed, with smarter debt management."""
     mape_data = monitor_mape()  
     if not mape_data:
-        print("⚠️ No MAPE data available for analysis.")
+        #print("⚠️ No MAPE data available for analysis.")
         return None
 
     # Load thresholds
@@ -64,15 +64,15 @@ def analyse_mape():
     # Block switching if in recovery mode
     if recovery_cycles > 0:
         recovery_cycles -= 1
-        print(f"⏳ Recovery mode active: {recovery_cycles} cycles remaining. No switching allowed.")
+        #print(f"⏳ Recovery mode active: {recovery_cycles} cycles remaining. No switching allowed.")
     else:
         if mape_data["score"] < min_score:
-            print("⚠️ Model score too low! Model switch required.")
+            #print("⚠️ Model score too low! Model switch required.")
             switch_needed = True
             threshold_violated = "score"
 
         if energy_debt > max_debt:
-            print(f"⚠️ Energy Debt ({energy_debt:.2f}) exceeded max allowed ({max_debt}). Switching models!")
+            #print(f"⚠️ Energy Debt ({energy_debt:.2f}) exceeded max allowed ({max_debt}). Switching models!")
             switch_needed = True
             threshold_violated = "energy"
             recovery_cycles = recovery_time  # Start recovery period
@@ -82,7 +82,7 @@ def analyse_mape():
     mape_info["recovery_cycles"] = recovery_cycles
     save_mape_info(mape_info)
 
-    print(f"📊 Current Energy Debt: {energy_debt:.2f}, Max Allowed: {max_debt}, Recovery: {recovery_cycles}")
+    #print(f"📊 Current Energy Debt: {energy_debt:.2f}, Max Allowed: {max_debt}, Recovery: {recovery_cycles}")
 
     return {
         "switch_needed": switch_needed,
@@ -103,7 +103,7 @@ def analyse_drift():
     drift_detected = kl_div > 0.5 or energy_dist > 0.1
 
     if drift_detected:
-        print("Drift detected! Storing drift data...")
+        #print("Drift detected! Storing drift data...")
         try:
             df = pd.read_csv("knowledge/predictions.csv")
             df.columns = df.columns.str.strip()
