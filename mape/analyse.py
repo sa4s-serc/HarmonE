@@ -70,7 +70,7 @@ def analyse_mape():
             print(f"⚠️ Energy threshold exceeded! Used: {used_energy:.4f}, Limit: {current_energy_threshold:.4f}")
             switch_needed = True
             threshold_violated = "energy"
-            recovery_cycles = 10
+            recovery_cycles = 3
 
     # Save updated info
     mape_info["recovery_cycles"] = recovery_cycles
