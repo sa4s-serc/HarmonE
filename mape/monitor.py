@@ -35,20 +35,20 @@ def monitor_mape():
     last_line = info["last_line"]
     current_model = get_current_model()
     if current_model is None:
-        #print("⚠️ No model currently in use.")
+        print("⚠️ No model currently in use.")
         return None
 
     try:
         df = pd.read_csv("knowledge/predictions.csv", skiprows=range(1, last_line + 1))
         df.columns = df.columns.str.strip()
         if df.empty:
-            #print("📉 No new data to process in predictions.csv")
+            print("📉 No new data to process in predictions.csv")
             return None
     except FileNotFoundError:
-        #print("⚠️ No predictions.csv file found.")
+        print("⚠️ No predictions.csv file found.")
         return None
 
-    #print(f"🆕 Processing {len(df)} new rows from predictions.csv for {current_model.upper()}")
+    print(f"🆕 Processing {len(df)} new rows from predictions.csv for {current_model.upper()}")
 
     r2 = r2_score(df["true_value"], df["predicted_value"])
 
@@ -56,7 +56,7 @@ def monitor_mape():
     with open(thresholds_file, "r") as f:
         thresholds = json.load(f)
     energy_min, energy_max = thresholds["E_m"], thresholds["E_M"]
-    #print(df["energy"].mean() ,energy_min,energy_max)
+    print(df["energy"].mean() ,energy_min,energy_max)
     energy_normalized = (df["energy"].mean() - energy_min)/(energy_max - energy_min)
 
     beta = thresholds.get("beta", 0.5)
@@ -72,10 +72,10 @@ def monitor_mape():
     info["last_line"] += len(df)
 
     # Log computed values
-    #print(f"🔹 R² Score: {r2:.4f}")
-    #print(f"🔹 Normalized Energy: {energy_normalized:.4f}")
-    #print(f"🔹 Model Score for {current_model.upper()}: {model_score:.4f}")
-    #print(f"🔹 Updated EMA Score for {current_model.upper()}: {final_score:.4f}")
+    print(f"🔹 R² Score: {r2:.4f}")
+    print(f"🔹 Normalized Energy: {energy_normalized:.4f}")
+    print(f"🔹 Model Score for {current_model.upper()}: {model_score:.4f}")
+    print(f"🔹 Updated EMA Score for {current_model.upper()}: {final_score:.4f}")
 
     save_mape_info(info)
 
@@ -93,7 +93,7 @@ def monitor_drift():
         df = pd.read_csv("knowledge/predictions.csv")
         df.columns = df.columns.str.strip()
         if df.empty:
-            #print("Drift Monitor: No predictions yet.")
+            print("Drift Monitor: No predictions yet.")
             return None
 
         window_size = 1200
@@ -105,12 +105,12 @@ def monitor_drift():
                 np.histogram(current_window, bins=50, density=True)[0] + 1e-10
             )
             #? energy_dist = wasserstein_distance(reference_window, current_window)
-            #print(f"🌊 Drift: KL={kl_div:.4f}, Energy Distance={energy_dist:.4f}")
+            print(f"🌊 Drift: KL={kl_div:.4f}, Energy Distance={energy_dist:.4f}")
             return {"kl_div": kl_div}#?, "energy_distance": energy_dist}
         else:
-            #print(f"Not enough data for drift detection. Have {len(df)} samples, need {window_size * 2}")
+            print(f"Not enough data for drift detection. Have {len(df)} samples, need {window_size * 2}")
             return None
     
     except FileNotFoundError:
-        #print("Drift Monitor: No predictions found.")
+        print("Drift Monitor: No predictions found.")
         return None

@@ -34,7 +34,7 @@ def plan_mape():
     """Select the best model based on EMA scores or exploratory switching."""
     analysis = analyse_mape()
     if not analysis or not analysis["switch_needed"]:
-        #print("✅ No model switch needed (Thresholds not violated).")
+        print("✅ No model switch needed (Thresholds not violated).")
         return None
 
     threshold_violated = analysis["threshold_violated"]
@@ -54,18 +54,18 @@ def plan_mape():
     # If in exploratory mode, choose a random model
     if random.random() < alpha:
         chosen_model = random.choice(["lstm", "linear", "svm"])
-        #print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
+        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
     
     # If energy is the issue, pick the most energy-efficient model
     elif threshold_violated == "energy":
         chosen_model = min(MODEL_ENERGY_EFFICIENCY, key=MODEL_ENERGY_EFFICIENCY.get)
-        #print(f"⚡ Energy threshold violated. Switching to the most efficient model: {chosen_model.upper()}")
+        print(f"⚡ Energy threshold violated. Switching to the most efficient model: {chosen_model.upper()}")
     
     # Otherwise, choose the best-scoring model
     else:
-        #print(ema_scores)
+        print(ema_scores)
         chosen_model = max(ema_scores, key=ema_scores.get)
-        #print(f"🏆 Choosing best model based on EMA scores: {chosen_model.upper()}")
+        print(f"🏆 Choosing best model based on EMA scores: {chosen_model.upper()}")
 
     # Check if the chosen model is already in use
     try:
@@ -75,7 +75,7 @@ def plan_mape():
         current_model = None  
 
     if chosen_model == current_model:
-        #print(f"🔄 Model {chosen_model.upper()} is already in use. No switch needed.")
+        print(f"🔄 Model {chosen_model.upper()} is already in use. No switch needed.")
         return None
 
     return chosen_model

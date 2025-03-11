@@ -11,10 +11,10 @@ def execute_mape():
     """Switch to the best model based on MAPE analysis."""
     decision = plan_mape()
     if not decision:
-        #print("MAPE: No action needed.")
+        print("MAPE: No action needed.")
         return
 
-    #print(f"⚡ Switching model to {decision.upper()}")
+    print(f"⚡ Switching model to {decision.upper()}")
     with open("knowledge/model.csv", "w") as f:
         f.write(decision)
 
@@ -28,7 +28,7 @@ def execute_mape():
 
             with open(debt_file, "w") as f:
                 json.dump(debt_data, f, indent=4)
-            #print(f"💰 Debt reduced from {previous_debt:.2f} to {new_debt:.2f}")
+            print(f"💰 Debt reduced from {previous_debt:.2f} to {new_debt:.2f}")
 
         except FileNotFoundError:
             print("⚠️ No debt file found. Skipping debt reduction.")
