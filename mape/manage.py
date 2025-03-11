@@ -43,13 +43,13 @@ def run_execute_drift():
 
 def run_periodic_retrain():
     while True:
-        time.sleep(300)
+        time.sleep(500)
         # Ensure `drift.csv` has data by storing last 1200 rows from `predictions.csv`
         try:
             df = pd.read_csv(predictions_file)
             df.columns = df.columns.str.strip()
             if not df.empty:
-                df.tail(1200).to_csv(drift_file, index=False)
+                df.tail(1500).to_csv(drift_file, index=False)
                 print("✔ Updated drift.csv with the last 1200 rows from predictions.csv")
             else:
                 print("⚠️ Predictions file is empty. No data available for retraining.")
