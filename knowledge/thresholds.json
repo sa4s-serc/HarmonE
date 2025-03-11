@@ -1,9 +1,9 @@
 {
     "min_score": 0.7,
     "max_energy": 0.5,
-    "beta": 0.5,
+    "beta": 0.9,
     "gamma": 0.8,
     "alpha": 0.1,
-    "E_m": 5000,
+    "E_m": 0,
     "E_M": 25000
 }

@@ -24,7 +24,7 @@ def log_energy(function_name, energy_joules):
 
 def run_execute_mape():
     while True:
-        time.sleep(20)
+        time.sleep(40)
         meter = pyRAPL.Measurement("execute_mape")
         meter.begin()
         execute_mape()
