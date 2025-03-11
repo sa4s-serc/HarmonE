@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import shutil
 from plan import plan_mape, plan_drift
 
@@ -16,7 +17,6 @@ def execute_mape():
     #print(f"⚡ Switching model to {decision.upper()}")
     with open("knowledge/model.csv", "w") as f:
         f.write(decision)
-
 
         # Reduce debt only if the planner selected a more efficient model
         try:
@@ -60,3 +60,5 @@ def execute_drift():
     elif decision["action"] == "retrain":
         print("🚀 Triggering retraining...")
         os.system("python retrain.py")
+
+    time.sleep(400)
