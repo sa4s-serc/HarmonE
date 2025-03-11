@@ -70,7 +70,7 @@ t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
 t1.start()
 # t2.start()
-t3.start()
+# t3.start()
 
 # Prevent script from exiting
 exit_event = threading.Event()
