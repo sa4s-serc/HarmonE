@@ -107,7 +107,7 @@ def analyse_drift():
         try:
             df = pd.read_csv("knowledge/predictions.csv")
             df.columns = df.columns.str.strip()
-            df.tail(500).to_csv("knowledge/drift.csv", index=False)
+            df.tail(1200).to_csv("knowledge/drift.csv", index=False)
         except FileNotFoundError:
             print("No predictions file found to store drift data.")
     
