@@ -1,26 +1,23 @@
 import os
 import pandas as pd
-import random
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import pickle
-from cloud_simulation import get_dynamic_price, get_sustainability_score
 from sklearn.svm import SVR
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, TensorDataset
 
-# Ensure base directories exist
+# Ensure directories exist
 base_dir = "versionedMR"
 os.makedirs(base_dir, exist_ok=True)
-original_model_dir = "models"
-os.makedirs(original_model_dir, exist_ok=True)
+model_dir = "models"
+os.makedirs(model_dir, exist_ok=True)
 
-JOB_QUEUE_FILE = "jobs_queue.csv"
-if not os.path.exists(JOB_QUEUE_FILE):
-    pd.DataFrame(columns=["model", "region", "cost", "sustainability", "timestamp"]).to_csv(JOB_QUEUE_FILE, index=False)
+drift_file = "knowledge/drift.csv"
+model_file = "knowledge/model.csv"
 
 def get_next_version(model_name):
     """Finds the next version number for a given model."""
@@ -34,27 +31,29 @@ def get_next_version(model_name):
     return 1
 
 def save_model_and_data(model, model_name, train_data):
-    """Saves the trained model and training data in both the versioned and original directory."""
+    """Saves trained model and its data in `models/` and `versionedMR/`."""
     version = get_next_version(model_name)
     version_path = os.path.join(base_dir, model_name, f"version_{version}")
     os.makedirs(version_path, exist_ok=True)
 
+    # Save model
     if model_name == "lstm":
-        model_path = os.path.join(original_model_dir, f"{model_name}.pth")
+        model_path = os.path.join(model_dir, f"{model_name}.pth")
         torch.save(model.state_dict(), model_path)
         torch.save(model.state_dict(), os.path.join(version_path, f"{model_name}.pth"))
     else:
-        model_path = os.path.join(original_model_dir, f"{model_name}.pkl")
+        model_path = os.path.join(model_dir, f"{model_name}.pkl")
         with open(model_path, "wb") as f:
             pickle.dump(model, f)
         with open(os.path.join(version_path, f"{model_name}.pkl"), "wb") as f:
             pickle.dump(model, f)
 
+    # Save training data
     train_data.to_csv(os.path.join(version_path, "data.csv"), index=False)
     print(f"✔ {model_name} saved at {version_path} and {model_path}")
 
 def create_sequences(data, seq_length=5):
-    """Create time series sequences for training."""
+    """Creates time series sequences for training."""
     X, y = [], []
     for i in range(len(data) - seq_length):
         X.append(data[i:i+seq_length])
@@ -73,7 +72,7 @@ class LSTMModel(nn.Module):
         return self.fc(h_n[-1])
 
 def train_lstm(X_train, y_train):
-    """Train LSTM model"""
+    """Trains an LSTM model."""
     X_train_tensor = torch.tensor(X_train, dtype=torch.float32).unsqueeze(-1)
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32).unsqueeze(-1)
     
@@ -93,78 +92,45 @@ def train_lstm(X_train, y_train):
 
     return model
 
-def enqueue_retraining(model_name):
-    """Adds a retraining request to the queue with cost and sustainability details."""
-    region = random.choice(["Amsterdam", "India", "USA"])
-    cost = get_dynamic_price(region)
-    sustainability = get_sustainability_score(region)
+def retrain():
+    """Retrains the current model using `drift.csv`."""
+    if not os.path.exists(drift_file) or not os.path.exists(model_file):
+        print("❌ Missing required files: `drift.csv` or `model.csv`.")
+        return
 
-    job = pd.DataFrame([[model_name, region, cost, sustainability, pd.Timestamp.now()]],
-                       columns=["model", "region", "cost", "sustainability", "timestamp"])
-    
-    job.to_csv(JOB_QUEUE_FILE, mode='a', header=False, index=False)
-    print(f"✔ Added {model_name} retraining job to queue in {region} (Cost: ${cost}, Sustainability: {sustainability})")
+    try:
+        drift_data = pd.read_csv(drift_file)["true_value"].values
+        with open(model_file, "r") as f:
+            model_name = f.read().strip()
+    except Exception as e:
+        print(f"❌ Error loading files: {e}")
+        return
 
-def execute_retraining(model_name):
-    """Performs model retraining when conditions are optimal."""
-    print(f"🚀 Starting retraining for {model_name}...")
+    print(f"🚀 Retraining {model_name} using drift data...")
 
-    drift_data = pd.read_csv("knowledge/drift.csv")
-    data = drift_data["true_value"].values
-
+    # Preprocess data
     scaler = MinMaxScaler()
-    data_scaled = scaler.fit_transform(data.reshape(-1, 1)).flatten()
-
+    data_scaled = scaler.fit_transform(drift_data.reshape(-1, 1)).flatten()
     seq_length = 5
     X_train, y_train = create_sequences(data_scaled, seq_length)
     train_df = pd.DataFrame({"train_data": data_scaled})
 
+    # Train model
     if model_name == "linear":
         model = Ridge(alpha=256)
         model.fit(X_train, y_train)
-        save_model_and_data(model, "linear", train_df)
-
     elif model_name == "svm":
         model = SVR(kernel="linear", C=0.05, tol=0.16)
         model.fit(X_train, y_train)
-        save_model_and_data(model, "svm", train_df)
-
     elif model_name == "lstm":
         model = train_lstm(X_train, y_train)
-        save_model_and_data(model, "lstm", train_df)
-
     else:
         print(f"❌ Unknown model type: {model_name}")
         return
 
+    # Save retrained model
+    save_model_and_data(model, model_name, train_df)
     print(f"✔ {model_name} retraining completed.")
 
-def main():
-    print("🔍 Checking drift and scheduling retraining jobs...")
-
-    try:
-        drift_data = pd.read_csv("knowledge/drift.csv")
-        with open("knowledge/model.csv", "r") as f:
-            model_to_train = f.read().strip()
-
-        if drift_data.empty or model_to_train == "":
-            print("❌ Error: One or both input files are empty")
-            return
-
-        region = random.choice(["Amsterdam", "India", "USA"])
-        cost = get_dynamic_price(region)
-        
-        if cost < 0.3:  # Threshold to decide immediate retraining vs queuing
-            print(f"💰 Low cost detected (${cost}), retraining immediately in {region}.")
-            execute_retraining(model_to_train)
-        else:
-            print(f"📌 Cost too high (${cost}), scheduling retraining in queue.")
-            enqueue_retraining(model_to_train)
-
-    except FileNotFoundError as e:
-        print(f"❌ Error: {str(e)}")
-    except Exception as e:
-        print(f"❌ Error during retraining: {str(e)}")
-
 if __name__ == "__main__":
-    main()
+    retrain()
