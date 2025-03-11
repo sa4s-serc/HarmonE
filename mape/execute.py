@@ -18,21 +18,6 @@ def execute_mape():
     with open("knowledge/model.csv", "w") as f:
         f.write(decision)
 
-        # Reduce debt only if the planner selected a more efficient model
-        try:
-            with open(debt_file, "r") as f:
-                debt_data = json.load(f)
-            previous_debt = debt_data["debt"]
-            new_debt = max(0, previous_debt - 0.2)  # Gradually reduce debt
-            debt_data["debt"] = new_debt
-
-            with open(debt_file, "w") as f:
-                json.dump(debt_data, f, indent=4)
-            print(f"💰 Debt reduced from {previous_debt:.2f} to {new_debt:.2f}")
-
-        except FileNotFoundError:
-            print("⚠️ No debt file found. Skipping debt reduction.")
-
 def execute_drift():
     """Replaces model with best version or retrains if necessary."""
     decision = plan_drift()
