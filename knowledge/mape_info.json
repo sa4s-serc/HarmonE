@@ -1,6 +1,6 @@
 {
     "last_line": 0,
-    "energy_debt": 0,
+    "current_energy_threshold": 0.5,
     "linear_version": 1,
     "lstm_version": 1,
     "svm_version": 1,

@@ -44,41 +44,44 @@ def plan_mape():
     ema_scores = mape_info["ema_scores"]
 
     # Load exploration probability (alpha)
-    try:
-        with open(thresholds_file, "r") as f:
-            thresholds = json.load(f)
-        alpha = thresholds.get("alpha", 0.1)
-    except FileNotFoundError:
-        alpha = 0.1
+    with open(thresholds_file, "r") as f:
+        thresholds = json.load(f)
+    alpha = thresholds.get("alpha", 0.1)
 
-    # If in exploratory mode, choose a random model
-    if random.random() < alpha:
-        chosen_model = random.choice(["lstm", "linear", "svm"])
-        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
-    
-    # If energy is the issue, pick the most energy-efficient model
-    elif threshold_violated == "energy":
-        chosen_model = min(MODEL_ENERGY_EFFICIENCY, key=MODEL_ENERGY_EFFICIENCY.get)
-        print(f"⚡ Energy threshold violated. Switching to the most efficient model: {chosen_model.upper()}")
-    
-    # Otherwise, choose the best-scoring model
-    else:
-        print(ema_scores)
-        chosen_model = max(ema_scores, key=ema_scores.get)
-        print(f"🏆 Choosing best model based on EMA scores: {chosen_model.upper()}")
-
-    # Check if the chosen model is already in use
+    # Get currently used model
     try:
         with open(model_file, "r") as f:
             current_model = f.read().strip()
     except FileNotFoundError:
         current_model = None  
 
+    # Exploratory switching with probability alpha
+    if random.random() < alpha:
+        chosen_model = random.choice(["lstm", "linear", "svm"])
+        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
+    
+    # If energy threshold was exceeded, choose highest-scoring model not currently in use
+    elif threshold_violated == "energy":
+        best_alternative = sorted(ema_scores.items(), key=lambda x: x[1], reverse=True)
+        chosen_model = next((m for m, _ in best_alternative if m != current_model), None)
+        if chosen_model:
+            print(f"⚡ Energy threshold violated. Switching to best available model: {chosen_model.upper()}")
+        else:
+            print(f"⚠️ No alternative models available. Staying on {current_model.upper()}.")
+            return None
+
+    # Otherwise, choose the highest-scoring model
+    else:
+        chosen_model = max(ema_scores, key=ema_scores.get)
+        print(f"🏆 Choosing best model based on EMA scores: {chosen_model.upper()}")
+
+    # Check if already using the chosen model
     if chosen_model == current_model:
         print(f"🔄 Model {chosen_model.upper()} is already in use. No switch needed.")
         return None
 
     return chosen_model
+
 
 
 def plan_drift():
