@@ -10,7 +10,7 @@ model_file = "knowledge/model.csv"
 def execute_mape():
     """Switch to the best model based on MAPE analysis."""
     decision = plan_mape()
-    return
+    # return
     if not decision:
         print("MAPE: No action needed.")
         return
@@ -36,10 +36,6 @@ def execute_drift():
         # Replace the model with the best version
         model_target_path = os.path.join("models", f"{model_name}{model_extension}")
         shutil.copy(best_version_path, model_target_path)
-
-        with open(model_file, "w") as f:
-            f.write(model_name)
-
         print(f"✔ Switched to lower KL divergence model: {best_version_path}")
 
     elif decision["action"] == "retrain":
