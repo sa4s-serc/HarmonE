@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import threading
 import time
-from scipy.stats import entropy, wasserstein_distance
+from scipy.stats import entropy
 import json
 import os
 from sklearn.metrics import r2_score
@@ -12,16 +12,6 @@ thresholds_file = "knowledge/thresholds.json"
 model_file = "knowledge/model.csv"
 
 def load_mape_info():
-    # """Load stored MAPE info including model-specific EMA scores."""
-    # if not os.path.exists(mape_info_file):
-    #     return {
-    #         "last_line": 0,
-    #         "energy_debt": 0,
-    #         "lr_model_version": 1,
-    #         "lstm_model_version": 1,
-    #         "svm_model_version": 1,
-    #         "ema_scores": {"lstm": 0.5, "linear": 0.5, "svm": 0.5}
-    #     }
     with open(mape_info_file, "r") as f:
         return json.load(f)
 

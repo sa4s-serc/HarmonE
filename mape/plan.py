@@ -82,9 +82,16 @@ def plan_mape():
 
 
 def plan_drift():
-    """Decide if retraining is needed based on drift analysis."""
+    """Decide if retraining is needed or if an older version can be used."""
     drift = analyse_drift()
-    if drift and drift["drift_detected"]:
-        #print("🔧 Drift detected! Retraining required.")
-        return "retrain"
-    return None
+    if not drift or not drift["drift_detected"]:
+        print("✅ No drift detected. No action required.")
+        return None
+
+    if drift["best_version"]:
+        print(f"🔄 Switching to lower KL divergence model: {drift['best_version']}")
+        return {"action": "replace", "version": drift["best_version"]}
+    
+    print("🔧 Drift detected! No previous version available. Retraining required.")
+    return {"action": "retrain"}
+

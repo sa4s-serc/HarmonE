@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 from plan import plan_mape, plan_drift
 
 debt_file = "knowledge/debt.json"
@@ -33,8 +34,29 @@ def execute_mape():
             print("⚠️ No debt file found. Skipping debt reduction.")
 
 def execute_drift():
-    """Triggers model retraining if drift is detected."""
+    """Replaces model with best version or retrains if necessary."""
     decision = plan_drift()
-    if decision == "retrain":
-        #print("🔧 Retraining model due to drift...")
+
+    if not decision:
+        print("Drift: No action needed.")
+        return
+
+    if decision["action"] == "replace":
+        best_version_path = decision["version"]
+        model_name = os.path.basename(best_version_path).split(".")[0]  # Extract model name
+
+        # Determine correct file extension
+        model_extension = ".pkl" if model_name in ["linear", "svm"] else ".pth"
+
+        # Replace the model with the best version
+        model_target_path = os.path.join("models", f"{model_name}{model_extension}")
+        shutil.copy(best_version_path, model_target_path)
+
+        with open(model_file, "w") as f:
+            f.write(model_name)
+
+        print(f"✔ Switched to lower KL divergence model: {best_version_path}")
+
+    elif decision["action"] == "retrain":
+        print("🚀 Triggering retraining...")
         os.system("python retrain.py")

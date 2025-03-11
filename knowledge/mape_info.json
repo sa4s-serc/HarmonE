@@ -1,9 +1,9 @@
 {
     "last_line": 0,
     "energy_debt": 0,
-    "lr_model_version": 1,
-    "lstm_model_version": 1,
-    "svm_model_version": 1,
+    "linear_version": 1,
+    "lstm_version": 1,
+    "svm_version": 1,
     "ema_scores": {
         "lstm": 0.82,
         "linear": 0.75,

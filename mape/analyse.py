@@ -1,6 +1,8 @@
 import os
 import json
+import numpy as np
 import pandas as pd
+from scipy.stats import entropy
 from monitor import monitor_mape, monitor_drift
 
 thresholds_file = "knowledge/thresholds.json"
@@ -98,68 +100,14 @@ def get_model_versions(model_name):
     """Returns available versions for a given model."""
     model_dir = os.path.join(base_version_dir, model_name)
     if not os.path.exists(model_dir):
+        print("debug: Hey! this path is incorrect")
         return []
     return sorted([d for d in os.listdir(model_dir) if d.startswith("version_")], key=lambda x: int(x.split("_")[-1]))
 
 def get_best_version(model_name):
     """Finds the version with the lowest KL divergence from past data."""
     versions = get_model_versions(model_name)
-    if not versions:
-        return None  # No previous versions exist
-
-    if not os.path.exists(drift_data_file):
-        print("⚠️ No drift.csv found. Cannot compare versions.")
-        return None
-
-    # Load current drift data
-    try:
-        drift_data = pd.read_csv(drift_data_file)["true_value"].values
-        drift_hist, _ = np.histogram(drift_data, bins=50, density=True)
-    except Exception as e:
-        print(f"❌ Error reading drift.csv: {e}")
-        return None
-
-    min_kl_div = float("inf")
-    best_version = None
-
-    for version in versions:
-        version_data_path = os.path.join(base_version_dir, model_name, version, "data.csv")
-        if not os.path.exists(version_data_path):
-            continue
-
-        # Load versioned model's training data
-        try:
-            version_data = pd.read_csv(version_data_path)["train_data"].values
-            version_hist, _ = np.histogram(version_data, bins=50, density=True)
-        except Exception as e:
-            print(f"❌ Error reading {version_data_path}: {e}")
-            continue
-
-        # Compute KL divergence
-        kl_div = entropy(drift_hist, version_hist)
-        print(f"🔎 KL divergence for {version}: {kl_div:.4f}")
-
-        if kl_div < min_kl_div:
-            min_kl_div = kl_div
-            best_version = version_data_path  # Return the best version data path
-
-    # Store KL divergences for debugging
-    with open(drift_kl_file, "w") as f:
-        json.dump({"best_version": best_version, "min_kl_div": min_kl_div}, f, indent=4)
-
-    return best_version if min_kl_div < 0.75 else None  # Use version if KL is below threshold
-
-def get_model_versions(model_name):
-    """Returns available versions for a given model."""
-    model_dir = os.path.join(base_version_dir, model_name)
-    if not os.path.exists(model_dir):
-        return []
-    return sorted([d for d in os.listdir(model_dir) if d.startswith("version_")], key=lambda x: int(x.split("_")[-1]))
-
-def get_best_version(model_name):
-    """Finds the version with the lowest KL divergence from past data."""
-    versions = get_model_versions(model_name)
-    if not versions:
+    if len(versions)<=1:
         return None  # No previous versions exist
 
     if not os.path.exists(drift_data_file):
