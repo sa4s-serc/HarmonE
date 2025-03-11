@@ -85,7 +85,7 @@ for i in range(len(X_stream)):
         prediction = lstm_model(X_tensor).detach().numpy().flatten()[0]
 
     elif chosen_model == "linear":
-        with open("models/lr.pkl", "rb") as f:
+        with open("models/linear.pkl", "rb") as f:
             lr_model = pickle.load(f)
         prediction = lr_model.predict(X_input)[0]
 
