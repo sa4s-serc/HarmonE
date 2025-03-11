@@ -1,7 +1,7 @@
 {
     "min_score": 0.75,
     "max_energy": 1,
-    "beta": 0.92,
+    "beta": 0.95,
     "gamma": 0.8,
     "alpha": 0.1,
     "E_m": 0,
