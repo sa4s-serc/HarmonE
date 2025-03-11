@@ -30,7 +30,7 @@ def get_next_version(model_name):
         return existing_versions[-1] + 1
     return 1  # Start from version_1 if none exists
 
-def save_model_and_data(model, model_name, train_data):
+def save_model_and_data(model, model_name, train_data_scaled, scaler):
     """Saves the trained model and corresponding training data in both the versioned and original directory."""
     version = get_next_version(model_name)
     version_path = os.path.join(base_dir, model_name, f"version_{version}")
@@ -48,14 +48,15 @@ def save_model_and_data(model, model_name, train_data):
         with open(os.path.join(version_path, f"{model_name}.pkl"), "wb") as f:
             pickle.dump(model, f)
 
-    # Save training data
-    train_data.to_csv(os.path.join(version_path, "data.csv"), index=False)
+    # Inverse transform before saving
+    train_data_original = scaler.inverse_transform(train_data_scaled["train_data"].values.reshape(-1, 1)).flatten()
+    train_df = pd.DataFrame({"train_data": train_data_original})
+
+    train_df.to_csv(os.path.join(version_path, "data.csv"), index=False)
 
     print(f"{model_name} saved at {version_path} and {model_path}")
 
 # Load the dataset
-# df = pd.read_csv("data/synthetic_data.csv")
-# data = df["aggregated_is_iceberg"].values
 df = pd.read_csv("data/pems/flow_data_train.csv")
 data = df["flow"].values
 
@@ -111,7 +112,7 @@ for epoch in tqdm(range(num_epochs), desc="LSTM Training Progress"):
 
 # Save LSTM model with versioning and in the original directory
 train_df = pd.DataFrame({"train_data": train_data})  # Convert training data to dataframe
-save_model_and_data(lstm_model, "lstm", train_df)
+save_model_and_data(lstm_model, "lstm", train_df, scaler)
 
 # ---------------- Linear Regression ----------------
 print("Training Linear Regression model...")
@@ -119,7 +120,7 @@ lr_model = Ridge(alpha=256)
 lr_model.fit(X_train, y_train)
 
 # Save Linear Regression model with versioning and in the original directory
-save_model_and_data(lr_model, "linear", train_df)
+save_model_and_data(lr_model, "linear", train_df, scaler)
 
 # ---------------- Support Vector Machine (SVM) ----------------
 print("Training SVM model...")
@@ -127,4 +128,4 @@ svm_model = SVR(kernel="linear", C=0.05, tol=0.16)
 svm_model.fit(X_train, y_train)
 
 # Save SVM model with versioning and in the original directory
-save_model_and_data(svm_model, "svm", train_df)
+save_model_and_data(svm_model, "svm", train_df, scaler)
