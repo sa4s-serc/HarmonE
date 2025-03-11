@@ -113,7 +113,6 @@ def retrain():
     data_scaled = scaler.fit_transform(drift_data.reshape(-1, 1)).flatten()
     seq_length = 5
     X_train, y_train = create_sequences(data_scaled, seq_length)
-    train_df = pd.DataFrame({"train_data": data_scaled})
 
     # Train model
     if model_name == "linear":
@@ -127,6 +126,10 @@ def retrain():
     else:
         print(f"❌ Unknown model type: {model_name}")
         return
+
+    # Inverse transform before saving
+    train_data_original = scaler.inverse_transform(data_scaled.reshape(-1, 1)).flatten()
+    train_df = pd.DataFrame({"train_data": train_data_original})
 
     # Save retrained model
     save_model_and_data(model, model_name, train_df)
