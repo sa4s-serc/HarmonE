@@ -10,6 +10,7 @@ model_file = "knowledge/model.csv"
 def execute_mape():
     """Switch to the best model based on MAPE analysis."""
     decision = plan_mape()
+    return
     if not decision:
         print("MAPE: No action needed.")
         return
@@ -21,7 +22,6 @@ def execute_mape():
 def execute_drift():
     """Replaces model with best version or retrains if necessary."""
     decision = plan_drift()
-
     if not decision:
         print("Drift: No action needed.")
         return

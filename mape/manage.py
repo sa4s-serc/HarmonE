@@ -37,7 +37,7 @@ def run_execute_drift():
         time.sleep(3)
         meter = pyRAPL.Measurement("execute_drift")
         meter.begin()
-        execute_drift()
+        # execute_drift()
         meter.end()
         log_energy("execute_drift", meter.result.pkg[0])
 
@@ -50,7 +50,7 @@ def run_periodic_retrain():
             df.columns = df.columns.str.strip()
             if not df.empty:
                 df.tail(1500).to_csv(drift_file, index=False)
-                print("✔ Updated drift.csv with the last 1200 rows from predictions.csv")
+                print("✔ Updated drift.csv with the last 1500 rows from predictions.csv")
             else:
                 print("⚠️ Predictions file is empty. No data available for retraining.")
         except FileNotFoundError:
@@ -66,11 +66,11 @@ def run_periodic_retrain():
 # Start all monitoring threads
 t1 = threading.Thread(target=run_execute_mape, daemon=True)
 t2 = threading.Thread(target=run_execute_drift, daemon=True)
-# t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
+t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
 t1.start()
 t2.start()
-# t3.start()
+t3.start()
 
 # Prevent script from exiting
 exit_event = threading.Event()
