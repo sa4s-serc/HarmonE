@@ -78,26 +78,26 @@ for i in range(len(X_stream)):
     
     if chosen_model == "lstm":
         lstm_model = LSTMModel()
-        lstm_model.load_state_dict(torch.load("models/lstm_model.pth", weights_only=False))
+        lstm_model.load_state_dict(torch.load("models/lstm.pth", weights_only=False))
         lstm_model.eval()
 
         X_tensor = torch.tensor(X_input, dtype=torch.float32).unsqueeze(-1)
         prediction = lstm_model(X_tensor).detach().numpy().flatten()[0]
 
     elif chosen_model == "linear":
-        with open("models/lr_model.pkl", "rb") as f:
+        with open("models/lr.pkl", "rb") as f:
             lr_model = pickle.load(f)
         prediction = lr_model.predict(X_input)[0]
 
     elif chosen_model == "svm":
-        with open("models/svm_model.pkl", "rb") as f:
+        with open("models/svm.pkl", "rb") as f:
             svm_model = pickle.load(f)
         prediction = svm_model.predict(X_input)[0]
 
     else:
         print(f"Unknown model '{chosen_model}'. Defaulting to LSTM.")
         lstm_model = LSTMModel()
-        lstm_model.load_state_dict(torch.load("models/lstm_model.pth"))
+        lstm_model.load_state_dict(torch.load("models/lstm.pth"))
         lstm_model.eval()
 
         X_tensor = torch.tensor(X_input, dtype=torch.float32).unsqueeze(-1)

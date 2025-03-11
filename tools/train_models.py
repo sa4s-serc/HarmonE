@@ -37,7 +37,7 @@ def save_model_and_data(model, model_name, train_data):
     os.makedirs(version_path, exist_ok=True)
 
     # Save model in both locations
-    if model_name == "lstm_model":
+    if model_name == "lstm":
         model_path = os.path.join(original_model_dir, f"{model_name}.pth")
         torch.save(model.state_dict(), model_path)
         torch.save(model.state_dict(), os.path.join(version_path, f"{model_name}.pth"))
@@ -111,7 +111,7 @@ for epoch in tqdm(range(num_epochs), desc="LSTM Training Progress"):
 
 # Save LSTM model with versioning and in the original directory
 train_df = pd.DataFrame({"train_data": train_data})  # Convert training data to dataframe
-save_model_and_data(lstm_model, "lstm_model", train_df)
+save_model_and_data(lstm_model, "lstm", train_df)
 
 # ---------------- Linear Regression ----------------
 print("Training Linear Regression model...")
@@ -119,7 +119,7 @@ lr_model = Ridge(alpha=256)
 lr_model.fit(X_train, y_train)
 
 # Save Linear Regression model with versioning and in the original directory
-save_model_and_data(lr_model, "lr_model", train_df)
+save_model_and_data(lr_model, "linear", train_df)
 
 # ---------------- Support Vector Machine (SVM) ----------------
 print("Training SVM model...")
@@ -127,4 +127,4 @@ svm_model = SVR(kernel="linear", C=0.05, tol=0.16)
 svm_model.fit(X_train, y_train)
 
 # Save SVM model with versioning and in the original directory
-save_model_and_data(svm_model, "svm_model", train_df)
+save_model_and_data(svm_model, "svm", train_df)

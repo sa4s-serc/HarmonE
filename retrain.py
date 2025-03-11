@@ -39,7 +39,7 @@ def save_model_and_data(model, model_name, train_data):
     version_path = os.path.join(base_dir, model_name, f"version_{version}")
     os.makedirs(version_path, exist_ok=True)
 
-    if model_name == "lstm_model":
+    if model_name == "lstm":
         model_path = os.path.join(original_model_dir, f"{model_name}.pth")
         torch.save(model.state_dict(), model_path)
         torch.save(model.state_dict(), os.path.join(version_path, f"{model_name}.pth"))
@@ -122,16 +122,16 @@ def execute_retraining(model_name):
     if model_name == "linear":
         model = Ridge(alpha=256)
         model.fit(X_train, y_train)
-        save_model_and_data(model, "lr_model", train_df)
+        save_model_and_data(model, "linear", train_df)
 
     elif model_name == "svm":
         model = SVR(kernel="linear", C=0.05, tol=0.16)
         model.fit(X_train, y_train)
-        save_model_and_data(model, "svm_model", train_df)
+        save_model_and_data(model, "svm", train_df)
 
     elif model_name == "lstm":
         model = train_lstm(X_train, y_train)
-        save_model_and_data(model, "lstm_model", train_df)
+        save_model_and_data(model, "lstm", train_df)
 
     else:
         print(f"❌ Unknown model type: {model_name}")
