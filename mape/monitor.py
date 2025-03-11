@@ -106,7 +106,7 @@ def monitor_drift():
             #print("Drift Monitor: No predictions yet.")
             return None
 
-        window_size = 500
+        window_size = 1200
         if len(df) >= window_size * 2:
             reference_window = df['true_value'].iloc[-2*window_size:-window_size]
             current_window = df['true_value'].iloc[-window_size:]
@@ -114,9 +114,9 @@ def monitor_drift():
                 np.histogram(reference_window, bins=50, density=True)[0] + 1e-10,
                 np.histogram(current_window, bins=50, density=True)[0] + 1e-10
             )
-            energy_dist = wasserstein_distance(reference_window, current_window)
+            #? energy_dist = wasserstein_distance(reference_window, current_window)
             #print(f"🌊 Drift: KL={kl_div:.4f}, Energy Distance={energy_dist:.4f}")
-            return {"kl_div": kl_div, "energy_distance": energy_dist}
+            return {"kl_div": kl_div}#?, "energy_distance": energy_dist}
         else:
             #print(f"Not enough data for drift detection. Have {len(df)} samples, need {window_size * 2}")
             return None

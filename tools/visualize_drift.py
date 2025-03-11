@@ -8,7 +8,7 @@ df = pd.read_csv("data/pems/flow_data_test.csv")
 df.columns = df.columns.str.strip()  # Strip any whitespace from column names
 
 # Parameters
-window_size = 750
+window_size = 1200
 step_size = 1  # Step size for sliding window
 bins = 50  # Number of bins for KL divergence
 
@@ -47,6 +47,7 @@ plt.plot(indices, kl_values, label="KL Divergence", color="blue")
 plt.xlabel("Data Index")
 plt.ylabel("KL Divergence")
 plt.title("KL Divergence Over Time")
+plt.axhline(0.75, color='r');
 plt.legend()
 plt.grid(True)
 plt.xticks(rotation=45)

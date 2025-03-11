@@ -27,8 +27,9 @@ def run_execute_mape():
         log_energy("execute_mape", meter.result.pkg[0]) 
 
 def run_execute_drift():
+    time.sleep(400)
     while True:
-        time.sleep(120)  # Runs every 120 seconds
+        time.sleep(3)  # Runs every 3 seconds
         meter = pyRAPL.Measurement("execute_drift")
         meter.begin()
         execute_drift()

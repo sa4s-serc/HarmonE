@@ -98,9 +98,9 @@ def analyse_drift():
         return None
 
     kl_div = drift_data["kl_div"]
-    energy_dist = drift_data["energy_distance"]
-
-    drift_detected = kl_div > 0.5 or energy_dist > 0.1
+    #? energy distance no longer considered
+    # energy_dist = drift_data["energy_distance"]
+    drift_detected = kl_div > 0.5 #? or energy_dist > 0.1
 
     if drift_detected:
         #print("Drift detected! Storing drift data...")
