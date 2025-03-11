@@ -43,7 +43,7 @@ def run_execute_drift():
 
 def run_periodic_retrain():
     while True:
-        time.sleep(600)
+        time.sleep(300)
         # Ensure `drift.csv` has data by storing last 1200 rows from `predictions.csv`
         try:
             df = pd.read_csv(predictions_file)
@@ -66,11 +66,11 @@ def run_periodic_retrain():
 # Start all monitoring threads
 t1 = threading.Thread(target=run_execute_mape, daemon=True)
 # t2 = threading.Thread(target=run_execute_drift, daemon=True)
-# t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
+t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
 t1.start()
 # t2.start()
-# t3.start()
+t3.start()
 
 # Prevent script from exiting
 exit_event = threading.Event()
