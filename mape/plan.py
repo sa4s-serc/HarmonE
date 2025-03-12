@@ -31,8 +31,10 @@ def load_mape_info():
         }
 
 def plan_mape():
-    """Select the best model based on EMA scores or exploratory switching."""
-    # Exploratory switching with probability alpha
+    # Load exploration probability (alpha
+    with open(thresholds_file, "r") as f:
+        thresholds = json.load(f)
+    alpha = thresholds.get("alpha", 0.1)
     if random.random() < alpha:
         chosen_model = random.choice(["lstm", "linear", "svm"])
         print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
@@ -48,11 +50,6 @@ def plan_mape():
     # Load model-specific EMA scores
     mape_info = load_mape_info()
     ema_scores = mape_info["ema_scores"]
-
-    # Load exploration probability (alpha)
-    with open(thresholds_file, "r") as f:
-        thresholds = json.load(f)
-    alpha = thresholds.get("alpha", 0.1)
 
     # Get currently used model
     try:
