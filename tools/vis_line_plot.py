@@ -7,7 +7,7 @@ models = {
     "Linear Regression": "output/updated/modified_predictions_linear.csv",
     "SVM": "output/updated/modified_predictions_svm.csv",
     "LSTM": "output/updated/modified_predictions_lstm.csv",
-    # "Switching": "output/runs/predictions_4_1.csv",
+    "Switching": "output/runs/predictions_4_3.csv",
     "Switching*": "output/runs/predictions_4_2.csv",
     "Retraining": "output/runs/predictions_8_1.csv",
     # "Retraining*": "output/runs/predictions_8_2.csv",
