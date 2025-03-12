@@ -7,7 +7,7 @@ models = {
     "Linear Regression": "output/updated/modified_predictions_linear.csv",
     "SVM": "output/updated/modified_predictions_svm.csv",
     "LSTM": "output/updated/modified_predictions_lstm.csv",
-    "Our Approach": "output/runs/predictions_9.csv"
+    "Our Approach": "output/unused_runs/predictions_9_bestsofar.csv"
 }
 
 # Create plots for each model
