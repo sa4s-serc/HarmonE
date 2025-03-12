@@ -1,5 +1,5 @@
 {
-    "min_score": 0.8,
+    "min_score": 0.78,
     "max_energy": 1,
     "beta": 0.95,
     "gamma": 0.8,

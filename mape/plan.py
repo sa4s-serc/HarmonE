@@ -32,6 +32,12 @@ def load_mape_info():
 
 def plan_mape():
     """Select the best model based on EMA scores or exploratory switching."""
+    # Exploratory switching with probability alpha
+    if random.random() < alpha:
+        chosen_model = random.choice(["lstm", "linear", "svm"])
+        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
+        return chosen_model
+    
     analysis = analyse_mape()
     if not analysis or not analysis["switch_needed"]:
         print("✅ No model switch needed (Thresholds not violated).")
@@ -53,15 +59,10 @@ def plan_mape():
         with open(model_file, "r") as f:
             current_model = f.read().strip()
     except FileNotFoundError:
-        current_model = None  
-
-    # Exploratory switching with probability alpha
-    if random.random() < alpha:
-        chosen_model = random.choice(["lstm", "linear", "svm"])
-        print(f"🎲 Exploratory switching active! Randomly selecting {chosen_model.upper()}.")
-    
+        current_model = None   
+        
     # If energy threshold was exceeded, choose highest-scoring model not currently in use
-    elif threshold_violated == "energy":
+    if threshold_violated == "energy":
         best_alternative = sorted(ema_scores.items(), key=lambda x: x[1], reverse=True)
         chosen_model = next((m for m, _ in best_alternative if m != current_model), None)
         if chosen_model:
