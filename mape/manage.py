@@ -66,11 +66,11 @@ def run_periodic_retrain():
 # Start all monitoring threads
 t1 = threading.Thread(target=run_execute_mape, daemon=True)
 t2 = threading.Thread(target=run_execute_drift, daemon=True)
-# t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
+t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
 t1.start()
 t2.start()
-# t3.start()
+t3.start()
 
 # Prevent script from exiting
 exit_event = threading.Event()
