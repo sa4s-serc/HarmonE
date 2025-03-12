@@ -96,7 +96,7 @@ def get_model_versions(model_name):
 def get_best_version(model_name):
     """Finds the version with the lowest KL divergence from past data."""
     versions = get_model_versions(model_name)
-    if len(versions)<=1:
+    if len(versions) <= 1:
         return None  # No previous versions exist
 
     if not os.path.exists(drift_data_file):
@@ -107,6 +107,7 @@ def get_best_version(model_name):
     try:
         drift_data = pd.read_csv(drift_data_file)["true_value"].values
         drift_hist, _ = np.histogram(drift_data, bins=50, density=True)
+        drift_hist += 1e-10  
     except Exception as e:
         print(f"❌ Error reading drift.csv: {e}")
         return None
@@ -123,12 +124,14 @@ def get_best_version(model_name):
         try:
             version_data = pd.read_csv(version_data_path)["train_data"].values
             version_hist, _ = np.histogram(version_data, bins=50, density=True)
+            version_hist += 1e-10  # ✅ Prevent zero probabilities
         except Exception as e:
             print(f"❌ Error reading {version_data_path}: {e}")
             continue
 
         # Compute KL divergence
         kl_div = entropy(drift_hist, version_hist)
+        kl_div = np.clip(kl_div, 0, 10) 
         print(f"🔎 KL divergence for {version}: {kl_div:.4f}")
 
         if kl_div < min_kl_div:

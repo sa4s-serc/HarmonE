@@ -4,10 +4,10 @@ import numpy as np
 
 # Define the models and corresponding filenames
 models = {
-    "Linear Regression": "output/modified/modified_predictions_linear.csv",
-    "SVM": "output/modified/modified_predictions_svm.csv",
-    "LSTM": "output/modified/modified_predictions_lstm.csv",
-    "Our Approach": "output/modified/modified_predictions_adaptive.csv"
+    "Linear Regression": "output/updated/modified_predictions_linear.csv",
+    "SVM": "output/updated/modified_predictions_svm.csv",
+    "LSTM": "output/updated/modified_predictions_lstm.csv",
+    "Our Approach": "output/runs/predictions_9.csv"
 }
 
 # Create plots for each model
