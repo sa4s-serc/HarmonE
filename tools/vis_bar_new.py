@@ -1,6 +1,6 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from sklearn.metrics import r2_score
 
 # Define model paths
@@ -8,7 +8,9 @@ models = {
     "Linear Regression": "output/updated/modified_predictions_linear.csv",
     "SVM": "output/updated/modified_predictions_svm.csv",
     "LSTM": "output/updated/modified_predictions_lstm.csv",
-    "Our Approach": "output/runs/predictions_9.csv"
+    "Retraining": "knowledge/predictions.csv",
+    "Our Approach": "output/unused_runs/predictions_9_bestsofar.csv",
+    "Our Approach*": "output/runs/predictions_9.csv",
 }
 
 # Store results
@@ -23,25 +25,43 @@ for model, path in models.items():
     avg_inference_times[model] = df['inference_time'].mean()
     avg_energies[model] = df['energy'].mean()
 
-# Plot
-fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+# Create a 1-row, 3-column subplot layout
+fig = make_subplots(rows=1, cols=3, subplot_titles=["R² Score", "Avg Inference Time (s)", "Avg Energy Consumption"])
 
-# R2 Score
-axes[0].bar(r2_scores.keys(), r2_scores.values(), color='skyblue')
-axes[0].set_title("R² Score")
-axes[0].set_ylabel("R²")
-axes[0].set_ylim(0, 1)
+# R² Score Plot
+fig.add_trace(go.Bar(
+    x=list(r2_scores.keys()), 
+    y=list(r2_scores.values()), 
+    marker_color='skyblue',
+    name="R² Score"
+), row=1, col=1)
 
-# Inference Time
-axes[1].bar(avg_inference_times.keys(), avg_inference_times.values(), color='lightcoral')
-axes[1].set_title("Avg Inference Time (s)")
-axes[1].set_ylabel("Time (s)")
+# Inference Time Plot
+fig.add_trace(go.Bar(
+    x=list(avg_inference_times.keys()), 
+    y=list(avg_inference_times.values()), 
+    marker_color='lightcoral',
+    name="Inference Time"
+), row=1, col=2)
 
-# Energy Consumption
-axes[2].bar(avg_energies.keys(), avg_energies.values(), color='lightgreen')
-axes[2].set_title("Avg Energy Consumption")
-axes[2].set_ylabel("Energy (J)")
+# Energy Consumption Plot
+fig.add_trace(go.Bar(
+    x=list(avg_energies.keys()), 
+    y=list(avg_energies.values()), 
+    marker_color='lightgreen',
+    name="Energy Consumption"
+), row=1, col=3)
 
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig('barplot.png')   
+# Update layout
+fig.update_layout(
+    title_text="Model Performance Metrics",
+    showlegend=False,  # Hide legends since titles indicate what each plot represents
+    height=500,
+    width=1200
+)
+
+# Rotate x-axis labels for better readability
+fig.update_xaxes(tickangle=-45)
+
+# Save the figure
+fig.write_image("barplot.png")
