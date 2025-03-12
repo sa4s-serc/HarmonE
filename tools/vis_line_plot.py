@@ -10,8 +10,9 @@ models = {
     "Switching": "output/runs/predictions_4_3.csv",
     "Switching*": "output/runs/predictions_4_2.csv",
     "Retraining": "output/runs/predictions_8_1.csv",
-    # "Retraining*": "output/runs/predictions_8_2.csv",
-    # "Our Approach": "output/runs/predictions_9_1.csv",
+    "Retraining*": "output/runs/predictions_8_2.csv",
+    "Retraining**": "output/runs/predictions_8_3.csv",
+    "Our Approach": "output/runs/predictions_9_1.csv",
     "Our Approach*": "output/runs/predictions_9_2.csv",
 }
 
