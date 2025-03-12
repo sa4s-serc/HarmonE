@@ -1,13 +1,15 @@
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
 
 # Define model paths
 models = {
     "Linear Regression": "output/updated/modified_predictions_linear.csv",
     "SVM": "output/updated/modified_predictions_svm.csv",
     "LSTM": "output/updated/modified_predictions_lstm.csv",
+    "Switching": "output/runs/predictions_4_1.csv",
+    "Switching*": "output/runs/predictions_4_2.csv",
     "Retraining": "output/runs/predictions_8_1.csv",
     "Retraining*": "output/runs/predictions_8_2.csv",
     "Our Approach": "output/runs/predictions_9_1.csv",
@@ -22,7 +24,7 @@ avg_energies = {}
 # Read each file and compute metrics
 for model, path in models.items():
     df = pd.read_csv(path)
-    r2_scores[model] = r2_score(df['true_value'], df['predicted_value'])
+    r2_scores[model] = mean_squared_error(df['true_value'], df['predicted_value'])
     avg_inference_times[model] = df['inference_time'].mean()
     avg_energies[model] = df['energy'].mean()
 
