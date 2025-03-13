@@ -116,7 +116,7 @@ def retrain():
 
     # Train model
     if model_name == "linear":
-        model = Ridge(alpha=256)
+        model = Ridge(alpha=200)
         model.fit(X_train, y_train)
     elif model_name == "svm":
         model = SVR(kernel="linear", C=0.05, tol=0.16)

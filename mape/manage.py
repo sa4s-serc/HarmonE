@@ -64,11 +64,11 @@ def run_periodic_retrain():
         log_energy("periodic_retrain", meter.result.pkg[0])
 
 # Start all monitoring threads
-# t1 = threading.Thread(target=run_execute_mape, daemon=True)
+t1 = threading.Thread(target=run_execute_mape, daemon=True)
 # t2 = threading.Thread(target=run_execute_drift, daemon=True)
 t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
-# t1.start()
+t1.start()
 # t2.start()
 t3.start()
 

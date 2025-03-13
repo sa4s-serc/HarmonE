@@ -5,19 +5,21 @@ from sklearn.metrics import mean_squared_error
 
 # Define model paths
 models = {
-    # "Linear Regression": "output/updated/modified_predictions_linear.csv",
+    "Linear Regression": "output/updated/modified_predictions_linear.csv",
+    "Linear Regression*": "output/runs/predictions_5_1.csv",
+    "Linear Regression**": "output/runs/predictions_5_2.csv",
     # "SVM": "output/updated/modified_predictions_svm.csv",
     # "LSTM": "output/updated/modified_predictions_lstm.csv",
     # "Switching": "output/runs/predictions_4_3.csv",
     # "Switching*": "output/runs/predictions_4_2.csv",
-    "Retraining": "output/runs/predictions_8_1.csv",
-    "Retraining*": "output/runs/predictions_8_2.csv",
-    "Retraining**": "output/runs/predictions_8_3.csv",
-    "Retraining***": "output/runs/predictions_8_4.csv",
-    "Our Approach": "output/runs/predictions_9_1.csv",
-    "Our Approach*": "output/runs/predictions_9_2.csv",
-    "Our Approach**": "output/runs/predictions_9_3.csv",
-    "Our Approach***": "output/runs/predictions_9_4.csv",
+    # "Retraining": "output/runs/predictions_8_1.csv",
+    # "Retraining*": "output/runs/predictions_8_2.csv",
+    # "Retraining**": "output/runs/predictions_8_3.csv",
+    # "Retraining***": "output/runs/predictions_8_4.csv",
+    # "Our Approach": "output/runs/predictions_9_1.csv",
+    # "Our Approach*": "output/runs/predictions_9_2.csv",
+    # "Our Approach**": "output/runs/predictions_9_3.csv",
+    # "Our Approach***": "output/runs/predictions_9_4.csv",
 }
 
 # Store results
