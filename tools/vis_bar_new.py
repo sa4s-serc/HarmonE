@@ -6,12 +6,14 @@ from sklearn.metrics import mean_squared_error
 # Define model paths
 models = {
     "Linear Regression": "output/runs/predictions_1.csv",
-    "Linear Regression*": "knowledge/predictions.csv",
+    "Linear Regression*": "output/runs/predictions_5_1.csv",
     # "Linear Regression**": "output/runs/predictions_5_2.csv",
     # "Linear Regression**": "knowledge/predictions.csv",
     "SVM": "output/runs/predictions_2.csv",
     "SVM*": "output/runs/predictions_6.csv",
     # "LSTM": "output/updated/modified_predictions_lstm.csv",
+    "LSTM": "output/runs/predictions_3.csv",
+    "LSTM*": "output/runs/predictions_7.csv",
     # "Switching": "output/runs/predictions_4_3.csv",
     # "Switching*": "output/runs/predictions_4_2.csv",
     # "Retraining": "output/runs/predictions_8_1.csv",
