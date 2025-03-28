@@ -56,6 +56,7 @@ Before training, ensure the `models/` directory is empty:
 
 ```bash
 rm -rf models/*
+rm -rf versionedMR/*/*
 ```
 
 ### 2. Generate Synthetic Data (Optional)
