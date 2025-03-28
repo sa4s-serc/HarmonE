@@ -5,7 +5,7 @@ import csv
 import os
 import pandas as pd
 from execute import execute_mape, execute_drift
-
+import time 
 pyRAPL.setup()
 log_file = "knowledge/mape_log.csv"
 predictions_file = "knowledge/predictions.csv"
@@ -26,9 +26,19 @@ def run_execute_mape():
     while True:
         time.sleep(40)
         meter = pyRAPL.Measurement("execute_mape")
+        
         meter.begin()
+        start_time = time.perf_counter()
+        
         execute_mape()
+        
+        end_time = time.perf_counter()
         meter.end()
+        
+        inference_time = end_time - start_time
+        print(f"Execution time (overhead) of execute_mape: {inference_time:.4f} seconds")
+        print(f"Energy consumption (pkg[0]): {meter.result.pkg[0]} uJ")
+        
         log_energy("execute_mape", meter.result.pkg[0]) 
 
 def run_execute_drift():
@@ -37,7 +47,7 @@ def run_execute_drift():
         time.sleep(3)
         meter = pyRAPL.Measurement("execute_drift")
         meter.begin()
-        # execute_drift()
+        execute_drift()
         meter.end()
         log_energy("execute_drift", meter.result.pkg[0])
 
@@ -63,15 +73,13 @@ def run_periodic_retrain():
         meter.end()
         log_energy("periodic_retrain", meter.result.pkg[0])
 
-# Start all monitoring threads
 t1 = threading.Thread(target=run_execute_mape, daemon=True)
-# t2 = threading.Thread(target=run_execute_drift, daemon=True)
-t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
+t2 = threading.Thread(target=run_execute_drift, daemon=True)
+# t3 = threading.Thread(target=run_periodic_retrain, daemon=True)
 
 t1.start()
-# t2.start()
-t3.start()
+t2.start()
+# t3.start()
 
-# Prevent script from exiting
 exit_event = threading.Event()
 exit_event.wait()
