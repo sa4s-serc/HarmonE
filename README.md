@@ -100,7 +100,7 @@ These baselines disable dynamic model switching. Instead, the inference system r
 
 ## 4. Running the System
 
-### 4.1 Running HarmonE (Dynamic Adaptation)
+### 4.1 Running HarmonE
 
 1. **Set the Baseline:**  
    For full dynamic adaptation, run:
@@ -114,7 +114,7 @@ These baselines disable dynamic model switching. Instead, the inference system r
    ```
    This will launch the appropriate threads (t1 and t2) for monitoring and drift detection. If python packages are not found, make sure you have entered the virtual enivironment for this terminal as well. Please install other dependencies if prompted.
 
-### 4.2 Running Other Baselines
+### 4.2 Running Baselines
 
 1. **Adaptive Baselines:**  
    - For `switch`, run:
