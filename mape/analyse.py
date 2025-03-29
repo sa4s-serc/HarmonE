@@ -15,14 +15,8 @@ drift_data_file = "knowledge/drift.csv"
 
 def load_mape_info():
     """Load stored MAPE info including energy debt and recovery cycles."""
-    try:
-        with open(mape_info_file, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return {
-            "energy_debt": 0,
-            "recovery_cycles": 0
-        }
+    with open(mape_info_file, "r") as f:
+        return json.load(f)
 
 def save_mape_info(data):
     """Save updated MAPE info including energy debt and recovery cycles."""

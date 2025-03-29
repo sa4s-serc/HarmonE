@@ -4,7 +4,6 @@ import time
 import shutil
 from plan import plan_mape, plan_drift
 
-debt_file = "knowledge/debt.json"
 model_file = "knowledge/model.csv"
 
 def execute_mape():

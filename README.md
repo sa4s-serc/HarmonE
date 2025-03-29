@@ -1,131 +1,70 @@
 # HarmonE
 
-## Prerequisites
+## 1. Introduction
 
-- Python 3.8 or higher
-- `virtualenv` or `venv` for creating a virtual environment
-- `pip` for installing Python packages
+**HarmonE** is a self-adaptive approach to architecting sustainable MLOps pipelines. It is designed to continuously monitor key performance and energy consumption metrics, adapting its behavior at runtime using the MAPE-K loop. The goal of HarmonE is to maintain both high predictive accuracy and low energy consumption by dynamically managing model switching, selective retraining, and versioned model reuse. This documentation outlines the setup and execution steps for the HarmonE system. 
 
-## Setup
+**Note:** This documentation follows a Linux system, and pyRAPL works only on Intel processors
 
-### 1. Create a Virtual Environment
+## 2. Setup
 
-To avoid conflicts with system-wide packages, create a virtual environment:
+### 2.1 Creating a Virtual Environment
+
+It is recommended to isolate the HarmonE project within a Python virtual environment. To create and activate a virtual environment, run the following commands:
 
 ```bash
-python3 -m venv venv
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-Activate the virtual environment:
+### 2.2 Installing Requirements
 
-- On macOS and Linux:
-
-  ```bash
-  source venv/bin/activate
-  ```
-
-- On Windows:
-
-  ```bash
-  venv\Scripts\activate
-  ```
-
-### 2. Install Required Packages
-
-Install the necessary Python packages from the `requirements.txt` file:
+Once the virtual environment is active, install the necessary Python packages with:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Set Permissions for pyRAPL
+This will install all dependencies required by HarmonE, including libraries for model training, energy profiling, and system monitoring.
 
-To allow pyRAPL to access energy consumption data, you need to set the appropriate permissions:
+### 2.3 Setting Permissions for pyRAPL
+
+To allow the `pyRAPL` library to access energy consumption data, you must grant the appropriate permissions. This is crucial for accurate energy profiling. Run:
 
 ```bash
 sudo chmod -R a+r /sys/class/powercap/intel-rapl
 ```
 
-This functionality is currently restricted to Linux systems and may not be supported with other Operating systems.
+**Important:** This permission adjustment is specific to Linux systems.
 
-## Training Models
+### 2.4 Running Cleanup Script
 
-### 1. Prepare the Models Directory
-
-Before training, ensure the `models/` directory is empty:
+Before starting the system, ensure you run the cleanup script to remove any stale files or data. Execute the script with:
 
 ```bash
-rm -rf models/*
-rm -rf versionedMR/*/*
+./cleanup.sh
 ```
 
-### 2. Generate Synthetic Data (Optional)
+This script removes models, resets CSV files to their header-only state, and writes fresh configuration data to JSON files as specified.
 
-If you need synthetic data for training, you can generate it using the following script:
+## 3. Starting the Systems
 
-```bash
-python tools/synthetic_data_generation.py
-```
+### 3.1 Inference System
 
-### 3. Train Models
-
-Train your models using the `train_models.py` script. Make sure to run this from the project's root directory:
-
-```bash
-python tools/train_models.py
-```
-
-## Running the System
-
-### 1. Clearing `predictions.csv`
-
-To clear the `predictions.csv` file (located in the `knowledge/` directory) so that it retains new predictions:
-
-```bash
-sed -i '2,$d' knowledge/predictions.csv
-```
-
-### Explanation:
-- `sed`: A stream editor for filtering and transforming text.
-- `-i`: Edits the file in place.
-- `'2,$d'`: Deletes all lines from the second line (`2`) to the end of the file (`$`).
-
-### 2. Start the Inference System
-
-To run the main inference system, execute the following command:
+To start the main inference system, run the following command:
 
 ```bash
 python3 inference.py
 ```
 
-### 3. Start the Management System
+This command launches the inference subsystem, which is responsible for handling real-time predictions using the selected ML models.
 
-In a separate terminal, start the management system:
+### 3.2 Management System
+
+In a separate terminal, start the management system with:
 
 ```bash
 python mape/manage.py
 ```
 
-## Directory Structure
-```
-|-- README.md               # Project documentation and setup instructions
-|-- data/                   # Directory for storing datasets (raw or processed)
-|-- inference.py            # Main script for running the inference system
-|-- knowledge/              # Directory containing knowledge files
-|   |-- drift.csv           # File tracking model drift information
-|   |-- model.csv           # File containing model metadata or configurations
-|   `-- predictions.csv     # File storing prediction results
-|-- mape/                   # Directory for MAPE-K loop components
-|   |-- analyse.py          # Script for analyzing system behavior
-|   |-- execute.py          # Script for executing adaptation actions
-|   |-- manage.py           # Main script for managing the system
-|   |-- monitor.py          # Script for monitoring system performance
-|   `-- plan.py             # Script for planning adaptation strategies
-|-- models/                 # Directory for storing trained models
-|   |-- lr_model.pkl        # Trained Linear Regression model
-|   |-- lstm_model.pth      # Trained LSTM model
-|   `-- svm_model.pkl       # Trained SVM model
-|-- requirements.txt        # List of Python dependencies
-|-- retrain.py              # Script for retraining models
-|-- tools/                  # Directory containing utility scripts
-```
+The management system monitors system performance, detects uncertainties, and triggers the appropriate adaptation strategies using the MAPE-K loop.
