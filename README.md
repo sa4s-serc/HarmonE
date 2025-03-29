@@ -42,10 +42,21 @@ sudo chmod -R a+r /sys/class/powercap/intel-rapl
 Before starting the system, ensure you run the cleanup script to remove any stale files or data. Execute the script with:
 
 ```bash
+chmod +x cleanup.sh
 ./cleanup.sh
 ```
 
 This script removes models, resets CSV files to their header-only state, and writes fresh configuration data to JSON files as specified.
+
+### 2.5 Train Models
+
+After running the cleanup script, execute:
+
+```bash
+python3 tools/train_models.py
+```
+
+This command populates the current model repository and stores the first version in the versioned model repository.
 
 ## 3. Starting the Systems
 
@@ -64,7 +75,7 @@ This command launches the inference subsystem, which is responsible for handling
 In a separate terminal, start the management system with:
 
 ```bash
-python mape/manage.py
+python3 mape/manage.py
 ```
 
 The management system monitors system performance, detects uncertainties, and triggers the appropriate adaptation strategies using the MAPE-K loop.
