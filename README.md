@@ -1,81 +1,145 @@
 # HarmonE
 
-## 1. Introduction
+HarmonE is a self-adaptive framework for sustainable MLOps pipelines. It integrates a dynamic adaptation mechanism based on the MAPE-K loop to balance energy consumption and predictive accuracy by managing model switching, selective retraining, and versioned model reuse.
 
-**HarmonE** is a self-adaptive approach to architecting sustainable MLOps pipelines. It is designed to continuously monitor key performance and energy consumption metrics, adapting its behavior at runtime using the MAPE-K loop. The goal of HarmonE is to maintain both high predictive accuracy and low energy consumption by dynamically managing model switching, selective retraining, and versioned model reuse. This documentation outlines the setup and execution steps for the HarmonE system. 
+This documentation covers setup instructions, baseline configurations, and details about key files and directories used in HarmonE.
 
-**Note:** This documentation follows a Linux system, and pyRAPL works only on Intel processors
+---
 
-## 2. Setup
+## 1. Overview
 
-### 2.1 Creating a Virtual Environment
+- **HarmonE** continuously monitors system metrics (e.g., prediction accuracy and energy consumption) and adapts model usage at runtime.
+- **Model Repository:**  
+  - The `models/` folder stores the current versions of the models available for inference.
+  - The `versionedMR/` folder archives previous versions of models after retraining.
+- **Model Configuration:**  
+  - The file `knowledge/model.csv` stores the name of the model currently being used (e.g., `lstm`, `svm`, or `linear`).
 
-It is recommended to isolate the HarmonE project within a Python virtual environment. To create and activate a virtual environment, run the following commands:
+---
 
+## 2. Setup Instructions
+
+### 2.1 Environment Setup
+
+1. **Create a Virtual Environment:**  
+   Isolate the HarmonE project by creating and activating a Python virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+2. **Install Dependencies:**  
+   Install all required Python packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### 2.2 Permissions and Platform Requirements
+
+- **Linux Requirement:**  
+  This documentation assumes a Linux system environment.
+- **pyRAPL Usage:**  
+  The `pyRAPL` library (used for energy measurement) works only on Intel processors. To enable powercap functionality, set the following permissions:
+  ```bash
+  sudo chmod -R a+r /sys/class/powercap/intel-rapl
+  ```
+
+### 2.3 Preparing the Codebase
+
+1. **Cleanup Script:**  
+   Run the cleanup script to remove stale models and reset relevant CSV files. Ensure the script is executable:
+   ```bash
+   chmod +x cleanup.sh
+   ./cleanup.sh
+   ```
+
+2. **Model Training:**  
+   Populate the current model repository and store the first version in the versioned model repository:
+   ```bash
+   python3 tools/train_models.py
+   ```
+
+---
+
+## 3. Baseline Configurations
+
+The system supports nine baseline approaches, categorized into dynamic adaptation and single-model modes. A shell script named `set_approach.sh` is used to select the desired baseline. **Make sure to set execute permissions:**
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+chmod +x set_approach.sh
 ```
 
-### 2.2 Installing Requirements
+### 3.1 Dynamic Adaptation Baselines
 
-Once the virtual environment is active, install the necessary Python packages with:
+- **harmone:**  
+  Runs the full HarmonE system with both dynamic model switching (thread `t1` executing `execute_mape`) and drift detection (thread `t2` executing `execute_drift`).
+  
+- **switch:**  
+  Runs only thread `t1` (i.e., only monitoring via `execute_mape`).
 
-```bash
-pip install -r requirements.txt
-```
+- **switch+retrain:**  
+  Runs thread `t1` (monitoring) and thread `t3` (periodic retraining).
 
-This will install all dependencies required by HarmonE, including libraries for model training, energy profiling, and system monitoring.
+### 3.2 Single-Model Baselines
 
-### 2.3 Setting Permissions for pyRAPL
+These baselines disable dynamic model switching. Instead, the inference system runs a single model defined in `knowledge/model.csv`.
 
-To allow the `pyRAPL` library to access energy consumption data, you must grant the appropriate permissions. This is crucial for accurate energy profiling. Run:
+- **Without Retraining:**  
+  - `single-lstm`
+  - `single-svm`
+  - `single-linear`
 
-```bash
-sudo chmod -R a+r /sys/class/powercap/intel-rapl
-```
+- **With Retraining:**  
+  These options run periodic retraining (thread `t3`) in addition to using a fixed model.
+  - `single-lstm+retrain`
+  - `single-svm+retrain`
+  - `single-linear+retrain`
 
-**Important:** This permission adjustment is specific to Linux systems.
+**Note:** For single-model baselines, the `set_approach.sh` script automatically updates `knowledge/model.csv` to store the model name being used.
 
-### 2.4 Running Cleanup Script
+---
 
-Before starting the system, ensure you run the cleanup script to remove any stale files or data. Execute the script with:
+## 4. Running the System
 
-```bash
-chmod +x cleanup.sh
-./cleanup.sh
-```
+### 4.1 Running HarmonE (Dynamic Adaptation)
 
-This script removes models, resets CSV files to their header-only state, and writes fresh configuration data to JSON files as specified.
+1. **Set the Baseline:**  
+   For full dynamic adaptation, run:
+   ```bash
+   ./set_approach.sh harmone
+   ```
+2. **Start the Management System:**  
+   Then execute:
+   ```bash
+   python mape/manage.py
+   ```
+   This will launch the appropriate threads (t1 and t2) for monitoring and drift detection. If python packages are not found, make sure you have entered the virtual enivironment for this terminal as well. Please install other dependencies if prompted.
 
-### 2.5 Train Models
+### 4.2 Running Other Baselines
 
-After running the cleanup script, execute:
+1. **Adaptive Baselines:**  
+   - For `switch`, run:
+     ```bash
+     ./set_approach.sh switch
+     python mape/manage.py
+     ```
+   - For `switch+retrain`, run:
+     ```bash
+     ./set_approach.sh switch+retrain
+     python mape/manage.py
+     ```
 
-```bash
-python3 tools/train_models.py
-```
+2. **Single-Model Baselines:**  
+   - **Without Retraining:**  
+     To run a single model (e.g., LSTM), set the baseline:
+     ```bash
+     ./set_approach.sh single-lstm
+     ```
+     Then, run the inference system without starting `mape/manage.py` (the management system is not launched for these baselines).
 
-This command populates the current model repository and stores the first version in the versioned model repository.
-
-## 3. Starting the Systems
-
-### 3.1 Inference System
-
-To start the main inference system, run the following command:
-
-```bash
-python3 inference.py
-```
-
-This command launches the inference subsystem, which is responsible for handling real-time predictions using the selected ML models.
-
-### 3.2 Management System
-
-In a separate terminal, start the management system with:
-
-```bash
-python3 mape/manage.py
-```
-
-The management system monitors system performance, detects uncertainties, and triggers the appropriate adaptation strategies using the MAPE-K loop.
+   - **With Retraining:**  
+     For a single model with retraining (e.g., SVM), run:
+     ```bash
+     ./set_approach.sh single-svm+retrain
+     python mape/manage.py
+     ```
+     This will update `knowledge/model.csv` to `svm` and run periodic retraining via thread t3.
