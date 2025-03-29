@@ -61,9 +61,9 @@ This documentation covers setup instructions, baseline configurations, and detai
 
 ---
 
-## 3. Baseline Configurations
+## 3. Approach Configurations
 
-The system supports nine baseline approaches, categorized into dynamic adaptation and single-model modes. A shell script named `set_approach.sh` is used to select the desired baseline. **Make sure to set execute permissions:**
+The system supports nine approaches, categorized into dynamic adaptation and single-model modes. A shell script named `set_approach.sh` is used to select the desired baseline. **Make sure to set execute permissions:**
 ```bash
 chmod +x set_approach.sh
 ```
