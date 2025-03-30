@@ -31,6 +31,7 @@ This documentation covers setup instructions, baseline configurations, and detai
 2. **Install Dependencies:**  
    Install all required Python packages:
    ```bash
+   pip install torch --index-url https://download.pytorch.org/whl/cpu
    pip install -r requirements.txt
    ```
 

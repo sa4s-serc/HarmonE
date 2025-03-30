@@ -1,5 +1,4 @@
 pandas
-torch
 pyRAPL
 scikit-learn
 pymongo
