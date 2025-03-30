@@ -133,7 +133,7 @@ This tool provides a flexible and visually guided approach to introduce controll
 
 ---
 
-## 4. Approach Configurations
+## 5. Approach Configurations
 
 The system supports nine approaches, categorized into adaptative and single-model approaches. A shell script named `set_approach.sh` is used to select the desired approach. **Make sure to set execute permissions:**
 ```bash
@@ -142,7 +142,7 @@ chmod +x set_approach.sh
 > "Before running any approach configuration, please ensure you have completed the steps outlined in **Section 4: Preparing the Codebase**."
 
 
-### 4.1 Dynamic Adaptation Baselines
+### 5.1 Dynamic Adaptation Baselines
 
 - **harmone:**  
   Runs the full HarmonE system with both dynamic model switching (thread `t1` executing `execute_mape`) and drift detection (thread `t2` executing `execute_drift`).
@@ -153,7 +153,7 @@ chmod +x set_approach.sh
 - **switch+retrain:**  
   Runs thread `t1` (monitoring) and thread `t3` (periodic retraining).
 
-### 4.2 Single-Model Baselines
+### 5.2 Single-Model Baselines
 
 These baselines disable dynamic model switching. Instead, the inference system runs a single model defined in `knowledge/model.csv`.
 
@@ -172,9 +172,9 @@ These baselines disable dynamic model switching. Instead, the inference system r
 
 ---
 
-## 5. Running the System
+## 6. Running the System
 
-### 5.1 Running HarmonE
+### 6.1 Running HarmonE
 
 1. **Set the Baseline:**  
    For full dynamic adaptation, run:
@@ -199,7 +199,7 @@ These baselines disable dynamic model switching. Instead, the inference system r
 
 ---
 
-### 5.2 Running Baselines
+### 6.2 Running Baselines
 
 1. **Adaptive Baselines:**  
    - For **switch**:
