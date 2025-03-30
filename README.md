@@ -135,7 +135,7 @@ This tool provides a flexible and visually guided approach to introduce controll
 
 ## 4. Approach Configurations
 
-The system supports nine approaches, categorized into dynamic adaptation and single-model modes. A shell script named `set_approach.sh` is used to select the desired baseline. **Make sure to set execute permissions:**
+The system supports nine approaches, categorized into adaptative and single-model approaches. A shell script named `set_approach.sh` is used to select the desired approach. **Make sure to set execute permissions:**
 ```bash
 chmod +x set_approach.sh
 ```
@@ -181,39 +181,81 @@ These baselines disable dynamic model switching. Instead, the inference system r
    ```bash
    ./set_approach.sh harmone
    ```
-2. **Start the Management System:**  
-   Then execute:
+
+2. **Start the Inference System:**  
+   In one terminal (with the virtual environment activated), run:
+   ```bash
+   python3 inference.py
+   ```
+   This starts the inference subsystem that uses the models from the `models/` folder.
+
+3. **Start the Management System:**  
+   In a separate terminal (with the virtual environment activated), run:
    ```bash
    python mape/manage.py
    ```
-   This will launch the appropriate threads (t1 and t2) for monitoring and drift detection. If python packages are not found, make sure you have entered the virtual enivironment for this terminal as well. Please install other dependencies if prompted.
+   This will launch the appropriate threads (t1 and t2) for monitoring and drift detection.  
+   *If Python packages are not found, ensure you have activated your virtual environment and installed all dependencies.*
+
+---
 
 ### 5.2 Running Baselines
 
 1. **Adaptive Baselines:**  
-   - For `switch`, run:
-     ```bash
-     ./set_approach.sh switch
-     python mape/manage.py
-     ```
-   - For `switch+retrain`, run:
-     ```bash
-     ./set_approach.sh switch+retrain
-     python mape/manage.py
-     ```
+   - For **switch**:
+     1. Set the baseline:
+        ```bash
+        ./set_approach.sh switch
+        ```
+     2. Start the inference system:
+        ```bash
+        python3 inference.py
+        ```
+     3. In a separate terminal, start the management system:
+        ```bash
+        python mape/manage.py
+        ```
+   - For **switch+retrain**:
+     1. Set the baseline:
+        ```bash
+        ./set_approach.sh switch+retrain
+        ```
+     2. Start the inference system:
+        ```bash
+        python3 inference.py
+        ```
+     3. In a separate terminal, start the management system:
+        ```bash
+        python mape/manage.py
+        ```
 
-2. **Single-Model Baselines:**  
+2. **Single-Model Baselines:**
+
    - **Without Retraining:**  
-     To run a single model (e.g., LSTM), set the baseline:
-     ```bash
-     ./set_approach.sh single-lstm
-     ```
-     Then, run the inference system without starting `mape/manage.py` (the management system is not launched for these baselines).
-
+     To run a single model (e.g., LSTM):
+     1. Set the baseline:
+        ```bash
+        ./set_approach.sh single-lstm
+        ```
+     2. Start the inference system (do not launch the management system):
+        ```bash
+        python3 inference.py
+        ```
+   
    - **With Retraining:**  
-     For a single model with retraining (e.g., SVM), run:
-     ```bash
-     ./set_approach.sh single-svm+retrain
-     python mape/manage.py
-     ```
-     This will update `knowledge/model.csv` to `svm` and run periodic retraining via thread t3.
+     For a single model with retraining (e.g., SVM):
+     1. Set the baseline:
+        ```bash
+        ./set_approach.sh single-svm+retrain
+        ```
+     2. Start the inference system:
+        ```bash
+        python3 inference.py
+        ```
+     3. In a separate terminal, start the management system:
+        ```bash
+        python mape/manage.py
+        ```
+     This updates `knowledge/model.csv` to `svm` and runs periodic retraining (thread t3).
+
+---
