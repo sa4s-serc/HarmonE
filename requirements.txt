@@ -1,4 +1,6 @@
 pandas
+numpy
+matplotlib
 pyRAPL
 scikit-learn
 pymongo
