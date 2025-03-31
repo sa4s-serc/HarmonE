@@ -81,6 +81,8 @@ This setup ensures that you have a properly split dataset for both training your
 
 To simulate dta drift in your traffic flow data, you can use the `tools/induce_drift.py` script. This script allows you to interactively define drift regions and specify the magnitude of drift via scale and shift adjustments. The process is visualized with before-and-after plots for easy comparison.
 
+> Note: The HarmonE framework can be used without drift induction—this script is optional for robustness testing.
+
 **Steps:**
 
 1. **Prepare the Data:**  
@@ -113,7 +115,7 @@ To simulate dta drift in your traffic flow data, you can use the `tools/induce_d
 - The test data file is named `flow_data_test.csv` and is located in the `data/pems/` directory.
 - The drift induction is performed on the `flow` column, which should represent the traffic flow (in vehicles per 5 minutes).
 
-This tool provides a flexible and visually guided approach to introduce controlled drift into your test data, enabling you to evaluate the robustness of the HarmonE framework under shifting conditions.
+This script provides a flexible and visually guided approach to introduce controlled drift into your test data, enabling you to evaluate the robustness of the HarmonE framework under shifting conditions.
 
 
 ## 4 Preparing the Codebase
