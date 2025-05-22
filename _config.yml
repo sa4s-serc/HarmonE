@@ -28,3 +28,6 @@ markdown: kramdown
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+baseurl: "/HarmonE"
+url: "https://sa4s-serc.github.io"

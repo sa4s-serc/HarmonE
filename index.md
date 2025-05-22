@@ -20,9 +20,9 @@ data: https://pems.dot.ca.gov
 
 ## Abstract
 
-<img src="static/image/Intro.png" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
+<img src="{{ site.baseurl }}/static/image/Intro.png" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
 
-Machine learning powers much of what we use every day, but keeping the models that these systems use reliable and energy-efficient over time isn’t easy. Models drift, data changes, and retraining too often can drain resources. Retraining models too often wastes energy and resources, while doing too little can hurt performance.
+Machine Learning powers much of what we use every day, but keeping the models that these systems use reliable and energy-efficient over time isn’t easy. Models drift, data changes, and retraining too often can drain resources. Retraining models too often wastes energy and resources, while doing too little can hurt performance.
 
 **HarmonE** is our solution: an architectural approach that helps machine learning pipelines adapt on their own. It monitors accuracy, energy use, and data shifts to keep things running smoothly. It only takes action when needed—based on sustainability goals set in advance.
 
