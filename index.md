@@ -20,9 +20,9 @@ data: https://pems.dot.ca.gov
 
 ## Abstract
 
-<img src="{{ site.baseurl }}/static/image/Intro.png" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
+<img src="static/image/Intro.png" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
 
-Machine Learning powers much of what we use every day, but keeping the models that these systems use reliable and energy-efficient over time isn’t easy. Models drift, data changes, and retraining too often can drain resources. Retraining models too often wastes energy and resources, while doing too little can hurt performance.
+Machine learning powers much of what we use every day, but keeping the models that these systems use reliable and energy-efficient over time isn’t easy. Models drift, data changes, and retraining too often can drain resources. Retraining models too often wastes energy and resources, while doing too little can hurt performance.
 
 **HarmonE** is our solution: an architectural approach that helps machine learning pipelines adapt on their own. It monitors accuracy, energy use, and data shifts to keep things running smoothly. It only takes action when needed—based on sustainability goals set in advance.
 
@@ -58,12 +58,12 @@ HarmonE is composed of three main parts:
 
 - **Decision Map**: Sets design-time sustainability goals and constraints.
 
-<img src="/static/image/DM_excali.svg" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
+<img src="static/image/DM_excali.svg" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;">
 
 - **Managed System**: The ML pipeline for training and inference.
 - **Managing System**: The MAPE-K loop that drives adaptation.
 
-<img src="/static/image/HarmonE_Architecture.png" alt="HarmonE Architecture" style="max-width: 75%; display: block; margin: 2rem auto;">
+<img src="static/image/HarmonE_Architecture.png" alt="HarmonE Architecture" style="max-width: 75%; display: block; margin: 2rem auto;">
 
 
 ---
@@ -111,8 +111,8 @@ HarmonE proves that machine learning systems can be both effective and sustainab
 ```
 ---
 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding: 0 5%;">
-  <img src="/static/image/iiit_logo.svg" alt="IIIT Hyderabad" style="height: 150px; max-width: 30%;">
-  <img src="/static/image/sa4s_logo.svg" alt="SA4S Logo" style="height: 150px; max-width: 30%;">
-  <img src="/static/image/serc_logo.svg" alt="SERC Logo" style="height: 150px; max-width: 30%;">
+  <img src="static/image/iiit_logo.svg" alt="IIIT Hyderabad" style="height: 150px; max-width: 30%;">
+  <img src="static/image/sa4s_logo.svg" alt="SA4S Logo" style="height: 150px; max-width: 30%;">
+  <img src="static/image/serc_logo.svg" alt="SERC Logo" style="height: 150px; max-width: 30%;">
 </div>
 
