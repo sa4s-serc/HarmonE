@@ -77,7 +77,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>EcoMLS</em><br>
-        <small><strong>Accepted at:</strong> Greens 2024</small>
+        <small><strong>Accepted at:</strong> GREENS-ICSA 2024</small>
       </td>
       <td>Design‑time energy & accuracy budgets that trigger condition‑based adaptation.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2404.11411" target="_blank">Read&nbsp;EcoMLS</a></td>
@@ -93,7 +93,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>Digital Twin for ITS</em><br>
-        <small><strong>Accepted at:</strong> ICSA 2025</small>
+        <small><strong>Accepted at:</strong> AEDT-ICSA 2025</small>
       </td>
       <td>City‑scale Digital Twin that provides traceable metrics for adaptive evaluation.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2502.17646" target="_blank">Read&nbsp;DT&nbsp;Paper</a></td>
