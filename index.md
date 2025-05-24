@@ -161,7 +161,7 @@ We tested HarmonE on a digital twin of a city traffic system using the PeMS data
 
 ## Why HarmonE Matters
 
-HarmonE proves that machine learning systems can be both effective and sustainable. Instead of retraining on a fixed schedule, it adapts only when needed. This reduces energy use, preserves performance, and supports long-term reliability.
+HarmonE demonstrates that machine learning systems can be both effective and sustainable. Instead of retraining on a fixed schedule, it adapts only when needed. This reduces energy use, preserves performance, and supports long-term reliability.
 
 ---
 
