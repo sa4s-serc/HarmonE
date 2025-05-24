@@ -37,6 +37,15 @@
     type="text/javascript" id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
   </script>
+
+  <style>
+    @media (max-width: 600px) {
+      .conf-banner {
+        white-space: normal !important;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -46,9 +55,9 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <div style="background-color: #f7f7f7; padding: 0.2rem 3rem; display: flex; align-items: center; border-radius: 25px; margin: 1rem auto 0.5rem auto; width: fit-content;white-space: nowrap;">
+          <div class="conf-banner" style="background-color: #f7f7f7; padding: 0.2rem 3rem; display: flex; align-items: center; border-radius: 25px; margin: 1rem auto 0.5rem auto; width: fit-content; white-space: nowrap;">
             <img src="static/image/book.svg" alt="Conference Icon"
-                style="height: 1.75rem; margin-right: 0.6rem; opacity: 0.5;">
+              style="height: 1.75rem; margin-right: 0.6rem; opacity: 0.5;">
             <span style="font-size: 1.1rem; color: #333; font-weight: 500;">
               Accepted at the 
               <a href="https://conf.researchr.org/home/ecsa-2025" 
