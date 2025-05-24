@@ -148,20 +148,6 @@ hr {
   opacity: 1;
 }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th, td {
-    padding: 12px;
-    vertical-align: top;
-  }
-
-  td:first-child {
-    min-width: 220px; /* Wider space for the 'Prior Work' column */
-    white-space: nowrap;
-  }
 
   .button-purple {
     display: inline-block;
