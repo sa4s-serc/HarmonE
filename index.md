@@ -69,7 +69,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>Towards Architecting Sustainable MLOps</em><br>
-        <small><strong>Accepted at:</strong> ICSA 2024</small>
+        <small>ICSA 2024</small>
       </td>
       <td>Early sketch of combining runtime monitoring with energy‑accuracy trade‑offs.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2404.04572" target="_blank">Read&nbsp;Poster</a></td>
@@ -77,7 +77,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>EcoMLS</em><br>
-        <small><strong>Accepted at:</strong> GREENS-ICSA 2024</small>
+        <small>GREENS-ICSA 2024</small>
       </td>
       <td>Design‑time energy & accuracy budgets that trigger condition‑based adaptation.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2404.11411" target="_blank">Read&nbsp;EcoMLS</a></td>
@@ -85,7 +85,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>SWITCH</em><br>
-        <small><strong>Accepted at:</strong> SEAMS 2024</small>
+        <small>SEAMS 2024</small>
       </td>
       <td>Lightweight runtime switching among pre‑trained models for rapid response.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2402.06351" target="_blank">Read&nbsp;SWITCH</a></td>
@@ -93,7 +93,7 @@ HarmonE unifies insights from four earlier studies that each tackled sustainabil
     <tr>
       <td>
         <em>Digital Twin for ITS</em><br>
-        <small><strong>Accepted at:</strong> AEDT-ICSA 2025</small>
+        <small>AEDT-ICSA 2025</small>
       </td>
       <td>City‑scale Digital Twin that provides traceable metrics for adaptive evaluation.</td>
       <td><a class="button-purple" href="https://arxiv.org/pdf/2502.17646" target="_blank">Read&nbsp;DT&nbsp;Paper</a></td>
