@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HarmonE: A Self-Adaptive Approach to Architecting Sustainable MLOps</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/index.js"></script>
+
+  <!-- MathJax -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+        displayMath: [ ['$$', '$$'], ['\\[', '\\]'] ],
+        processEscapes: true, 
+        tags: 'all',
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script
+    type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+  </script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <div style="background-color: #f7f7f7; padding: 0.2rem 3rem; display: flex; align-items: center; border-radius: 25px; margin: 1rem auto 0.5rem auto; width: fit-content;white-space: nowrap;">
+            <img src="static/image/book.svg" alt="Conference Icon"
+                style="height: 1.75rem; margin-right: 0.6rem; opacity: 0.5;">
+            <span style="font-size: 1.1rem; color: #333; font-weight: 500;">
+              Accepted at the 
+              <a href="https://conf.researchr.org/home/ecsa-2025" 
+                style="color: #333; text-decoration: underline;">
+                19th European Conference on Software Architecture (ECSA 2025)
+              </a>
+            </span>
+          </div>
+          <h1 class="title is-1 publication-title">HarmonE: A Self-Adaptive Approach to Architecting Sustainable MLOps</h1>
+          
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              Hiya Bhatt<sup>1⋆</sup>,
+Shaunak Biswas<sup>1⋆</sup>,
+Srinivasan Rakhunathan<sup>2</sup>,
+Karthik Vaidhyanathan<sup>1</sup>
+
+            </span>
+          </div>
+          
+
+          
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <sup>1</sup>Software Engineering Research Centre, IIIT Hyderabad, India<br>
+<sup>2</sup>Microsoft, India<br>
+<span style="font-size: 0.8em;"><sup>⋆</sup>Equal contribution</span>
+
+            </span>
+          </div>
+          
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2505.13693"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              
+              <!-- Video Link. -->
+              
+              <!-- Code Link. -->
+              
+              <span class="link-block">
+                <a href="https://github.com/sa4s-serc/HarmonE"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              
+              <!-- Dataset Link. -->
+              
+              <span class="link-block">
+                <a href="https://pems.dot.ca.gov"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-database"></i>
+                  </span>
+                  <span>Data</span>
+                </a>
+              </span>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+<div class="container is-max-desktop">
+
+<div class="content">
+  <h2 id="abstract">Abstract</h2>
+
+<p><img src="static/image/Intro.png" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;" /></p>
+
+<p>Machine learning powers much of what we use every day, but keeping the models that these systems use reliable and energy-efficient over time isn’t easy. Models drift, data changes, and retraining too often can drain resources. Retraining models too often wastes energy and resources, while doing too little can hurt performance.</p>
+
+<p><strong>HarmonE</strong> is our solution: an architectural approach that helps machine learning pipelines adapt on their own. It monitors accuracy, energy use, and data shifts to keep things running smoothly. It only takes action when needed, based on sustainability goals set in advance.</p>
+
+<p>We tested HarmonE on a city’s traffic system using a digital twin. It adapted to new conditions while saving energy and maintaining performance. After all, sustainability isn’t just about quick fixes; it’s about building systems that can maintain their performance over time, even as conditions evolve.</p>
+
+<hr />
+
+<h2 id="motivation">Motivation</h2>
+
+<p>Today’s MLOps pipelines often focus on performance but overlook long-term sustainability. Frequent retraining maintains accuracy but is resource-intensive.</p>
+
+<p>HarmonE adds awareness and adaptability. It helps models stay efficient and accurate without wasting energy or compute.</p>
+
+<hr />
+
+<h2 id="backgroundpriorwork">Background &amp; Prior Work</h2>
+
+<p>HarmonE unifies insights from four earlier studies that each tackled sustainability from a different angle.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Prior Work</th>
+      <th>Key Idea</th>
+      <th>Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>Poster: Toward Sustainable MLOps</em><br /><small>(arXiv&nbsp;:2404.04572)</small></td>
+      <td>Early sketch of combining runtime monitoring with energy‑accuracy trade‑offs.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2404.04572" target="_blank">Read&nbsp;Poster</a></td>
+    </tr>
+    <tr>
+      <td><em>EcoMLS</em><br /><small>(arXiv&nbsp;:2404.11411)</small></td>
+      <td>Design‑time energy &amp; accuracy budgets that trigger condition‑based adaptation.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2404.11411" target="_blank">Read&nbsp;EcoMLS</a></td>
+    </tr>
+    <tr>
+      <td><em>SWITCH</em><br /><small>(arXiv&nbsp;:2402.06351)</small></td>
+      <td>Lightweight runtime switching among pre‑trained models for rapid response.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2402.06351" target="_blank">Read&nbsp;SWITCH</a></td>
+    </tr>
+    <tr>
+      <td><em>Digital Twin for ITS</em><br /><small>(arXiv&nbsp;:2502.17646)</small></td>
+      <td>City‑scale Digital Twin that provides traceable metrics for adaptive evaluation.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2502.17646" target="_blank">Read&nbsp;DT&nbsp;Paper</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>These works shaped HarmonE’s Decision Map, adaptive tactics, and evaluation testbed.</p>
+
+<hr />
+
+<h2 id="what-is-harmone">What is HarmonE?</h2>
+
+<p>HarmonE is a self-adaptive MLOps architecture built around the MAPE-K loop:</p>
+
+<ul>
+  <li><strong>Monitor</strong>: Tracks accuracy, energy use, and data changes.</li>
+  <li><strong>Analyze</strong>: Detects when things drift from expected behavior.</li>
+  <li><strong>Plan</strong>: Determines the best course of action.</li>
+  <li><strong>Execute</strong>: Applies the adaptation.</li>
+  <li><strong>Knowledge</strong>: Stores history and goals to guide decisions.</li>
+</ul>
+
+<p>You define sustainability goals like energy limits or minimum accuracy, and HarmonE helps the system meet them.</p>
+
+<hr />
+
+<h2 id="key-components">Key Components</h2>
+
+<p>HarmonE is composed of three main parts:</p>
+
+<ul>
+  <li><strong>Decision Map</strong>: Sets design-time sustainability goals and constraints.</li>
+</ul>
+
+<p><img src="static/image/DM_excali.svg" alt="Decision Map Illustration" style="max-width: 70%; display: block; margin: 1.5rem auto;" /></p>
+
+<ul>
+  <li><strong>Managed System</strong>: The ML pipeline for training and inference.</li>
+  <li><strong>Managing System</strong>: The MAPE-K loop that drives adaptation.</li>
+</ul>
+
+<p><img src="static/image/HarmonE_Architecture.png" alt="HarmonE Architecture" style="max-width: 75%; display: block; margin: 2rem auto;" /></p>
+
+<hr />
+
+<h2 id="evaluation-traffic-prediction-case-study">Evaluation: Traffic Prediction Case Study</h2>
+
+<p>We tested HarmonE on a digital twin of a city traffic system using the PeMS dataset. Compared with traditional setups, HarmonE:</p>
+
+<ul>
+  <li>Used 54.5% less energy than retraining-based approaches.</li>
+  <li>Achieved 95% of the best model’s accuracy.</li>
+  <li>Reduced inference time by over 50%.</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>Approach</th>
+      <th>Energy (mJ)</th>
+      <th>R² Score</th>
+      <th>Inference Time (ms)</th>
+      <th># Adaptations</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>LR</td>
+      <td>12.12</td>
+      <td>0.7597</td>
+      <td>0.83</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>LR + PRT</td>
+      <td>12.70</td>
+      <td>0.7624</td>
+      <td>0.83</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>SVM</td>
+      <td>14.76</td>
+      <td>0.7897</td>
+      <td>1.11</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>SVM + PRT</td>
+      <td>16.33</td>
+      <td>0.8167</td>
+      <td>1.11</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>LSTM</td>
+      <td>32.91</td>
+      <td>0.9005</td>
+      <td>3.85</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <td>LSTM + PRT</td>
+      <td>45.35</td>
+      <td>0.9085</td>
+      <td>3.85</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>Switch</td>
+      <td>24.32</td>
+      <td>0.8445</td>
+      <td>2.27</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>Switch + PRT</td>
+      <td>25.32</td>
+      <td>0.8435</td>
+      <td>2.27</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <td><strong>HarmonE</strong></td>
+      <td><strong>20.62</strong></td>
+      <td><strong>0.8628</strong></td>
+      <td><strong>1.89</strong></td>
+      <td><strong>12</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="why-harmone-matters">Why HarmonE Matters</h2>
+
+<p>HarmonE proves that machine learning systems can be both effective and sustainable. Instead of retraining on a fixed schedule, it adapts only when needed. This reduces energy use, preserves performance, and supports long-term reliability.</p>
+
+<hr />
+
+<h2 id="citation">Citation</h2>
+
+<div class="language-bibtex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">@misc</span><span class="p">{</span><span class="nl">bhatt2025harmoneselfadaptiveapproacharchitecting</span><span class="p">,</span>
+  <span class="na">title</span><span class="p">=</span><span class="s">{HarmonE: A Self-Adaptive Approach to Architecting Sustainable MLOps}</span><span class="p">,</span>
+  <span class="na">author</span><span class="p">=</span><span class="s">{Hiya Bhatt and Shaunak Biswas and Srinivasan Rakhunathan and Karthik Vaidhyanathan}</span><span class="p">,</span>
+  <span class="na">year</span><span class="p">=</span><span class="s">{2025}</span><span class="p">,</span>
+  <span class="na">eprint</span><span class="p">=</span><span class="s">{2505.13693}</span><span class="p">,</span>
+  <span class="na">archivePrefix</span><span class="p">=</span><span class="s">{arXiv}</span><span class="p">,</span>
+  <span class="na">primaryClass</span><span class="p">=</span><span class="s">{cs.SE}</span><span class="p">,</span>
+  <span class="na">url</span><span class="p">=</span><span class="s">{https://arxiv.org/abs/2505.13693}</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<hr />
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem; padding: 0 5%;">
+  <img src="static/image/iiit_logo.svg" alt="IIIT Hyderabad" style="height: 150px; max-width: 30%;" />
+  <img src="static/image/sa4s_logo.svg" alt="SA4S Logo" style="height: 150px; max-width: 30%;" />
+  <img src="static/image/serc_logo.svg" alt="SERC Logo" style="height: 150px; max-width: 30%;" />
+</div>
+
+
+</div>
+
+</div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            Website template borrowed from <a href="https://github.com/nerfies/nerfies.github.io">NeRFies</a> and <a href="https://github.com/shunzh/project_website">the Jekyll fork</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
