@@ -38,6 +38,47 @@ HarmonE adds awareness and adaptability. It helps models stay efficient and accu
 
 ---
 
+## Background & Prior Work
+
+HarmonE unifies insights from four earlier studies that each tackled sustainability from a different angle.
+
+<table>
+  <thead>
+    <tr>
+      <th>Prior Work</th>
+      <th>Key Idea</th>
+      <th>Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><em>Poster: Toward Sustainable MLOps</em><br><small>(arXiv&nbsp;:2404.04572)</small></td>
+      <td>Early sketch of combining runtime monitoring with energy‑accuracy trade‑offs.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2404.04572" target="_blank">Read&nbsp;Poster</a></td>
+    </tr>
+    <tr>
+      <td><em>EcoMLS</em><br><small>(arXiv&nbsp;:2404.11411)</small></td>
+      <td>Design‑time energy & accuracy budgets that trigger condition‑based adaptation.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2404.11411" target="_blank">Read&nbsp;EcoMLS</a></td>
+    </tr>
+    <tr>
+      <td><em>SWITCH</em><br><small>(arXiv&nbsp;:2402.06351)</small></td>
+      <td>Lightweight runtime switching among pre‑trained models for rapid response.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2402.06351" target="_blank">Read&nbsp;SWITCH</a></td>
+    </tr>
+    <tr>
+      <td><em>Digital Twin for ITS</em><br><small>(arXiv&nbsp;:2502.17646)</small></td>
+      <td>City‑scale Digital Twin that provides traceable metrics for adaptive evaluation.</td>
+      <td><a class="button-purple" href="https://arxiv.org/pdf/2502.17646" target="_blank">Read&nbsp;DT&nbsp;Paper</a></td>
+    </tr>
+  </tbody>
+</table>
+
+
+These works shaped HarmonE’s Decision Map, adaptive tactics, and evaluation testbed.
+
+---
+
 ## What is HarmonE?
 
 HarmonE is a self-adaptive MLOps architecture built around the MAPE-K loop:

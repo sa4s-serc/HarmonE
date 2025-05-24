@@ -148,21 +148,40 @@ hr {
   opacity: 1;
 }
 
-.button-purple {
-  display: inline-block;
-  background-color: #7e5bef;
-  color: white;
-  padding: 0.6em 1.2em;
-  margin: 0.5rem 0.5rem 1rem 0;
-  border: none;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-.button-purple:hover {
-  background-color: #6842d4;
-  transform: translateY(-2px);
-}
+  th, td {
+    padding: 12px;
+    vertical-align: top;
+  }
+
+  td:first-child {
+    min-width: 220px; /* Wider space for the 'Prior Work' column */
+    white-space: nowrap;
+  }
+
+  .button-purple {
+    display: inline-block;
+    background-color: #7c3aed;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    text-decoration: none;
+    font-weight: 500;
+    min-width: 130px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+  }
+
+  .button-purple:hover {
+    background-color: #6d28d9;
+    color: white;
+  }
+
+  td a.button-purple {
+    width: 100%;
+    box-sizing: border-box;
+  }
