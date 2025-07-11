@@ -4,10 +4,10 @@ permalink: /
 
 title: "HarmonE: A Self-Adaptive Approach to Architecting Sustainable MLOps"
 authors: |
-    Hiya Bhatt<sup>1⋆</sup>,
-    Shaunak Biswas<sup>1⋆</sup>,
-    Srinivasan Rakhunathan<sup>2</sup>,
-    Karthik Vaidhyanathan<sup>1</sup>
+    <a href="https://www.linkedin.com/in/hiya-bhatt-a465251a6/" target="_blank">Hiya Bhatt</a><sup>1⋆</sup>,
+    <a href="https://www.linkedin.com/in/shaunak-biswas-aa189a264/" target="_blank">Shaunak Biswas</a><sup>1⋆</sup>,
+    <a href="https://www.linkedin.com/in/srinivasanrakhunathan/" target="_blank">Srinivasan Rakhunathan</a><sup>2</sup>,
+    <a href="https://www.linkedin.com/in/karthikv1392/" target="_blank">Karthik Vaidhyanathan</a><sup>1</sup>
 affiliations: |
     <sup>1</sup>Software Engineering Research Centre, IIIT Hyderabad, India<br>
     <sup>2</sup>Microsoft, India<br>
